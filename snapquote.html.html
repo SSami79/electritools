@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SnapQuote — AI Electrical Estimator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080a0f;--surface:#0f1117;--card:#161820;--border:#1e2130;
+  --gold:#f5a623;--gold2:#fbbf24;--green:#22c55e;--red:#ef4444;--blue:#60a5fa;
+  --text:#f0f0f0;--muted:#4a5068;--sub:#8892a4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+input,button,select,textarea{font-family:'DM Sans',sans-serif}
+button{cursor:pointer}
+
+/* ── Header ── */
+header{
+  background:linear-gradient(180deg,#0c0e16 0%,transparent 100%);
+  padding:20px 20px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(20px);
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--gold),#e08000);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;box-shadow:0 4px 16px rgba(245,166,35,.3);
+}
+.logo-text{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:white}
+.logo-text span{color:var(--gold)}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+.api-pill{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:6px 12px;font-size:12px;color:var(--sub);
+  cursor:pointer;transition:all .2s;
+}
+.api-pill:hover{border-color:var(--gold);color:var(--gold)}
+.api-dot{width:7px;height:7px;border-radius:50%;background:var(--red)}
+.api-dot.on{background:var(--green)}
+
+/* ── Main ── */
+main{max-width:680px;margin:0 auto;padding:24px 16px 40px}
+
+/* ── Hero upload zone ── */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:20px;
+  padding:40px 20px;text-align:center;
+  background:var(--surface);
+  transition:all .25s;position:relative;overflow:hidden;
+  cursor:pointer;
+}
+.upload-zone::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(245,166,35,.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--gold);background:#0f1117}
+.upload-zone.drag{box-shadow:0 0 40px rgba(245,166,35,.15)}
+.upload-icon{font-size:48px;margin-bottom:14px;display:block}
+.upload-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px}
+.upload-sub{font-size:14px;color:var(--sub);line-height:1.6;max-width:340px;margin:0 auto 20px}
+.upload-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn-primary{
+  background:linear-gradient(135deg,var(--gold),#e08000);
+  border:none;border-radius:10px;padding:12px 22px;
+  color:#0d0d0f;font-size:14px;font-weight:700;
+  display:flex;align-items:center;gap:7px;
+  transition:all .2s;box-shadow:0 4px 16px rgba(245,166,35,.25);
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,166,35,.35)}
+.btn-ghost{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:12px 22px;
+  color:var(--sub);font-size:14px;font-weight:600;
+  display:flex;align-items:center;gap:7px;
+  transition:all .2s;
+}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+#file-input{display:none}
+
+/* ── Preview image ── */
+.img-preview-wrap{
+  position:relative;border-radius:16px;overflow:hidden;
+  margin-bottom:16px;background:var(--surface);
+  border:1px solid var(--border);
+}
+.img-preview{width:100%;max-height:320px;object-fit:cover;display:block}
+.img-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(8,10,15,.8) 0%,transparent 50%);
+  display:flex;align-items:flex-end;padding:16px;
+}
+.img-label{font-size:13px;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:6px}
+.img-change{
+  position:absolute;top:10px;right:10px;
+  background:rgba(8,10,15,.8);border:1px solid var(--border);
+  border-radius:8px;padding:6px 12px;color:var(--sub);font-size:12px;
+  backdrop-filter:blur(10px);transition:all .2s;
+}
+.img-change:hover{color:white;border-color:var(--sub)}
+
+/* ── Job context ── */
+.context-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:18px;margin-bottom:16px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.context-label{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.input-row{display:flex;gap:10px}
+.input-group{flex:1;display:flex;flex-direction:column;gap:5px}
+.field-label{font-size:11px;color:var(--sub);font-weight:500}
+.field-input{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:9px;padding:10px 12px;color:white;font-size:14px;
+  transition:border-color .15s;width:100%;
+}
+.field-input:focus{border-color:var(--gold);outline:none}
+.segs{display:flex;gap:6px;flex-wrap:wrap}
+.seg{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:7px;padding:7px 12px;color:var(--muted);font-size:12px;
+  font-weight:600;flex:1;text-align:center;transition:all .15s;
+}
+.seg.on{background:rgba(245,166,35,.1);border-color:var(--gold);color:var(--gold)}
+textarea.field-input{resize:none;height:72px;font-size:13px}
+
+/* ── Analyze button ── */
+.analyze-btn{
+  width:100%;padding:16px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,var(--gold) 0%,#e08000 100%);
+  color:#0d0d0f;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;
+  letter-spacing:.5px;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all .2s;box-shadow:0 6px 24px rgba(245,166,35,.3);
+  margin-bottom:24px;
+}
+.analyze-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 32px rgba(245,166,35,.4)}
+.analyze-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ── Loading state ── */
+.loading-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:32px;text-align:center;margin-bottom:16px;
+}
+.loading-steps{display:flex;flex-direction:column;gap:10px;margin:20px 0;text-align:left}
+.loading-step{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;border-radius:10px;background:var(--surface);
+  font-size:13px;color:var(--sub);transition:all .4s;
+}
+.loading-step.active{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.2);color:white}
+.loading-step.done{color:var(--green)}
+.step-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:var(--border)}
+.loading-step.active .step-icon{background:rgba(245,166,35,.2)}
+.loading-step.done .step-icon{background:rgba(34,197,94,.15)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.pulsing{animation:pulse 1.2s ease-in-out infinite}
+
+/* ── Quote result ── */
+@keyframes fadeSlide{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.quote-result{animation:fadeSlide .4s ease forwards}
+
+.result-header{
+  background:linear-gradient(135deg,#1a1c28,#12141e);
+  border:1px solid var(--border);border-radius:16px;padding:20px;
+  margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-start;
+}
+.result-job-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:4px}
+.result-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px}
+.tag-scope{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2)}
+.tag-complexity{background:rgba(245,166,35,.1);color:var(--gold);border:1px solid rgba(245,166,35,.2)}
+.tag-warn{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+
+.result-section{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:16px;margin-bottom:10px;
+}
+.rs-title{font-size:10px;font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px}
+
+/* Line items */
+.line-item{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 0;border-bottom:1px solid var(--border);
+}
+.line-item:last-child{border-bottom:none}
+.li-icon{font-size:15px;flex-shrink:0;width:24px;text-align:center}
+.li-name{flex:1;font-size:13px;font-weight:500}
+.li-qty{font-size:12px;color:var(--sub);min-width:40px;text-align:center}
+.li-price{font-size:14px;font-weight:700;color:white;min-width:72px;text-align:right;font-family:'Syne',sans-serif}
+
+/* Totals */
+.totals-block{display:flex;flex-direction:column;gap:8px}
+.total-row{display:flex;justify-content:space-between;font-size:14px;color:var(--sub)}
+.total-row.grand{
+  font-family:'Syne',sans-serif;font-size:26px;font-weight:800;
+  color:var(--green);border-top:1px solid var(--border);padding-top:12px;margin-top:4px;
+}
+
+/* Warnings */
+.warning-item{
+  display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);
+}
+.warning-item:last-child{border-bottom:none}
+.warn-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.warn-text{font-size:13px;color:var(--sub);line-height:1.5}
+.warn-text strong{color:white}
+
+/* Action buttons */
+.action-row{display:flex;gap:10px;margin-top:16px}
+.action-btn{
+  flex:1;padding:13px;border-radius:11px;font-size:13px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .2s;border:none;
+}
+.action-print{background:var(--green);color:white}
+.action-print:hover{filter:brightness(1.1)}
+.action-share{background:var(--card);border:1px solid var(--border);color:var(--sub)}
+.action-share:hover{border-color:var(--gold);color:var(--gold)}
+.action-edit{background:var(--card);border:1px solid var(--border);color:var(--sub)}
+.action-edit:hover{border-color:var(--blue);color:var(--blue)}
+
+/* API Key modal */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:100;display:flex;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-bg.hidden{display:none}
+.modal{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:680px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800}
+.modal-sub{font-size:13px;color:var(--sub);line-height:1.6}
+.modal-input{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:10px;padding:12px 14px;color:white;font-size:14px;width:100%;
+  font-family:'DM Mono',monospace,sans-serif;
+}
+.modal-input:focus{border-color:var(--gold);outline:none}
+.modal-row{display:flex;gap:10px}
+.modal-cancel{
+  flex:1;padding:13px;border-radius:10px;background:var(--surface);
+  border:1px solid var(--border);color:var(--sub);font-size:14px;font-weight:600;
+}
+.modal-save{
+  flex:2;padding:13px;border-radius:10px;
+  background:linear-gradient(135deg,var(--gold),#e08000);
+  border:none;color:#0d0d0f;font-size:14px;font-weight:800;
+}
+.step-list{display:flex;flex-direction:column;gap:7px}
+.step-li{font-size:12px;color:var(--sub);padding:7px 10px;background:var(--surface);border-radius:7px;line-height:1.5}
+.step-li code{color:var(--gold);font-size:11px}
+
+/* Editable quote items */
+.li-price-edit{
+  background:transparent;border:1px solid transparent;
+  border-radius:6px;padding:3px 6px;color:white;font-size:14px;
+  font-weight:700;width:80px;text-align:right;font-family:'Syne',sans-serif;
+}
+.li-price-edit:focus{border-color:var(--gold);background:var(--surface);outline:none}
+
+/* Empty state */
+.empty-tip{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:20px;margin-bottom:12px;
+}
+.tip-row{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border)}
+.tip-row:last-child{border-bottom:none}
+.tip-icon{font-size:20px;flex-shrink:0;width:28px}
+.tip-text{font-size:13px;color:var(--sub);line-height:1.5}
+.tip-text strong{color:white}
+
+@media print{header,.action-row,.upload-zone,.context-card,.analyze-btn,.empty-tip{display:none!important}body{background:white;color:black}.quote-result *{color:black!important}.result-header{background:white;border:1px solid #ccc}.result-section{border:1px solid #ccc}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="logo-text">Snap<span>Quote</span></div>
+      <div class="logo-sub">AI Electrical Estimator</div>
+    </div>
+  </div>
+  <button class="api-pill" onclick="openModal()">
+    <div class="api-dot" id="api-dot"></div>
+    <span id="api-status">Add API Key</span>
+  </button>
+</header>
+
+<main>
+
+  <!-- Upload zone (shown when no image) -->
+  <div id="upload-section">
+    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+      <span class="upload-icon">📸</span>
+      <div class="upload-title">Photo → Instant Quote</div>
+      <div class="upload-sub">Take a photo of the job site, electrical panel, or describe the work — AI generates a professional quote in seconds.</div>
+      <div class="upload-btns">
+        <button class="btn-primary" onclick="event.stopPropagation();document.getElementById('file-input').click()">
+          📷 Take Photo
+        </button>
+        <button class="btn-ghost" onclick="event.stopPropagation();document.getElementById('file-input').click()">
+          🖼 Choose Photo
+        </button>
+      </div>
+    </div>
+    <input type="file" id="file-input" accept="image/*" capture="environment" onchange="onFileSelect(event)"/>
+
+    <!-- Tips -->
+    <div class="empty-tip" style="margin-top:16px">
+      <div class="context-label" style="margin-bottom:10px">What works best</div>
+      <div class="tip-row"><span class="tip-icon">🔌</span><div class="tip-text"><strong>Electrical panels</strong> — AI identifies panel size, available slots, wiring condition, upgrade needs</div></div>
+      <div class="tip-row"><span class="tip-icon">🏗</span><div class="tip-text"><strong>Job sites</strong> — Rough-in work, outlet placement, conduit runs, service entrances</div></div>
+      <div class="tip-row"><span class="tip-icon">🔧</span><div class="tip-text"><strong>Existing wiring</strong> — Identify old wiring types, code violations, upgrade requirements</div></div>
+      <div class="tip-row"><span class="tip-icon">💬</span><div class="tip-text"><strong>No photo?</strong> — Just describe the job in the notes field and AI generates a quote from text</div></div>
+    </div>
+  </div>
+
+  <!-- Image preview + form (shown after image selected) -->
+  <div id="form-section" style="display:none">
+
+    <div class="img-preview-wrap">
+      <img id="preview-img" class="img-preview" src="" alt="Job site photo"/>
+      <div class="img-overlay">
+        <div class="img-label">📸 Job site photo ready for analysis</div>
+      </div>
+      <button class="img-change" onclick="resetPhoto()">Change Photo</button>
+    </div>
+
+    <div class="context-card">
+      <div class="context-label">Job Details (optional — helps AI be more accurate)</div>
+      <div class="input-row">
+        <div class="input-group">
+          <div class="field-label">Client Name</div>
+          <input class="field-input" id="ctx-client" placeholder="John Smith" type="text"/>
+        </div>
+        <div class="input-group">
+          <div class="field-label">Job Address</div>
+          <input class="field-input" id="ctx-addr" placeholder="123 Main St" type="text"/>
+        </div>
+      </div>
+      <div>
+        <div class="field-label" style="margin-bottom:5px">Job Type</div>
+        <div class="segs" id="job-type-segs">
+          <button class="seg on" onclick="setJobType(this,'Panel Upgrade')">Panel Upgrade</button>
+          <button class="seg" onclick="setJobType(this,'Rough-In')">Rough-In</button>
+          <button class="seg" onclick="setJobType(this,'Service Call')">Service Call</button>
+          <button class="seg" onclick="setJobType(this,'EV Charger')">EV Charger</button>
+          <button class="seg" onclick="setJobType(this,'Rewire')">Rewire</button>
+          <button class="seg" onclick="setJobType(this,'Other')">Other</button>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <div class="field-label">Labor Rate ($/hr)</div>
+          <input class="field-input" id="ctx-rate" value="95" type="number"/>
+        </div>
+        <div class="input-group">
+          <div class="field-label">Markup on Materials</div>
+          <div class="segs">
+            <button class="seg" onclick="setMarkup(this,'10%')">10%</button>
+            <button class="seg on" onclick="setMarkup(this,'20%')">20%</button>
+            <button class="seg" onclick="setMarkup(this,'30%')">30%</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="field-label" style="margin-bottom:5px">Additional Notes</div>
+        <textarea class="field-input" id="ctx-notes" placeholder="Any special requirements, existing conditions, customer requests..."></textarea>
+      </div>
+    </div>
+
+    <button class="analyze-btn" id="analyze-btn" onclick="analyzePhoto()">
+      <span id="analyze-icon">⚡</span>
+      <span id="analyze-text">Generate AI Quote</span>
+    </button>
+
+  </div>
+
+  <!-- Loading state -->
+  <div id="loading-section" style="display:none">
+    <div class="loading-card">
+      <div style="font-size:36px;margin-bottom:12px">🤖</div>
+      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:6px">Analyzing Job Site</div>
+      <div style="font-size:13px;color:var(--sub);margin-bottom:4px">AI is reviewing your photo and generating a professional quote</div>
+      <div class="loading-steps" id="loading-steps">
+        <div class="loading-step active" id="step-1"><div class="step-icon pulsing">👁</div><span>Analyzing photo for electrical components...</span></div>
+        <div class="loading-step" id="step-2"><div class="step-icon">📋</div><span>Identifying scope of work...</span></div>
+        <div class="loading-step" id="step-3"><div class="step-icon">💰</div><span>Calculating materials and labor...</span></div>
+        <div class="loading-step" id="step-4"><div class="step-icon">📄</div><span>Building professional quote...</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote result -->
+  <div id="result-section" style="display:none"></div>
+
+</main>
+
+<!-- API Key Modal -->
+<div class="modal-bg hidden" id="modal-bg" onclick="closeModalBg(event)">
+  <div class="modal">
+    <div class="modal-title">🔑 Claude API Key</div>
+    <div class="modal-sub">SnapQuote uses Claude AI to analyze photos and generate quotes. Your key is stored only in your browser — never sent to any server.</div>
+    <div class="step-list">
+      <div class="step-li">1. Go to <code>console.anthropic.com</code></div>
+      <div class="step-li">2. Click "API Keys" → "Create Key"</div>
+      <div class="step-li">3. Copy the key and paste it below</div>
+      <div class="step-li" style="color:#fbbf24">4. New accounts get free credits to start</div>
+    </div>
+    <input class="modal-input" id="api-key-input" type="password" placeholder="sk-ant-api03-..." autocomplete="off"/>
+    <div class="modal-row">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-save" onclick="saveApiKey()">Save & Connect</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let apiKey = localStorage.getItem('snapquote_key') || '';
+let currentImage = null;
+let currentJobType = 'Panel Upgrade';
+let currentMarkup = '20%';
+let quoteData = null;
+
+// ── Init ──────────────────────────────────────────────────────
+function init() {
+  updateApiStatus();
+}
+
+function updateApiStatus() {
+  const dot = document.getElementById('api-dot');
+  const status = document.getElementById('api-status');
+  if (apiKey) {
+    dot.className = 'api-dot on';
+    status.textContent = 'AI Connected';
+  } else {
+    dot.className = 'api-dot';
+    status.textContent = 'Add API Key';
+  }
+}
+
+// ── Modal ──────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('modal-bg').classList.remove('hidden');
+  document.getElementById('api-key-input').value = apiKey;
+}
+function closeModal() {
+  document.getElementById('modal-bg').classList.add('hidden');
+}
+function closeModalBg(e) {
+  if (e.target.id === 'modal-bg') closeModal();
+}
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) return;
+  apiKey = key;
+  localStorage.setItem('snapquote_key', key);
+  updateApiStatus();
+  closeModal();
+}
+
+// ── File handling ──────────────────────────────────────────────
+function onFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) loadImage(file);
+}
+function onDrag(e, isDragging) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.toggle('drag', isDragging);
+}
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadImage(file);
+}
+
+function loadImage(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    currentImage = e.target.result;
+    document.getElementById('preview-img').src = currentImage;
+    document.getElementById('upload-section').style.display = 'none';
+    document.getElementById('form-section').style.display = 'block';
+    document.getElementById('result-section').style.display = 'none';
+    document.getElementById('result-section').innerHTML = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetPhoto() {
+  currentImage = null;
+  document.getElementById('file-input').value = '';
+  document.getElementById('upload-section').style.display = 'block';
+  document.getElementById('form-section').style.display = 'none';
+  document.getElementById('loading-section').style.display = 'none';
+  document.getElementById('result-section').style.display = 'none';
+}
+
+function setJobType(btn, type) {
+  currentJobType = type;
+  document.querySelectorAll('#job-type-segs .seg').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function setMarkup(btn, markup) {
+  currentMarkup = markup;
+  btn.parentElement.querySelectorAll('.seg').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ── Analyze ───────────────────────────────────────────────────
+async function analyzePhoto() {
+  if (!apiKey) {
+    openModal();
+    return;
+  }
+
+  const client = document.getElementById('ctx-client').value;
+  const addr = document.getElementById('ctx-addr').value;
+  const rate = document.getElementById('ctx-rate').value || '95';
+  const notes = document.getElementById('ctx-notes').value;
+  const markup = parseInt(currentMarkup) / 100;
+
+  // Show loading
+  document.getElementById('form-section').style.display = 'none';
+  document.getElementById('loading-section').style.display = 'block';
+  document.getElementById('result-section').style.display = 'none';
+
+  // Animate loading steps
+  const steps = ['step-1','step-2','step-3','step-4'];
+  const delays = [0, 2000, 4000, 6000];
+  steps.forEach((id, i) => {
+    setTimeout(() => {
+      steps.forEach(s => {
+        const el = document.getElementById(s);
+        el.classList.remove('active');
+        if (el.classList.contains('active')) {
+          el.classList.add('done');
+          el.querySelector('.step-icon').textContent = '✓';
+          el.querySelector('.step-icon').classList.remove('pulsing');
+        }
+      });
+      // Mark previous as done
+      if (i > 0) {
+        const prev = document.getElementById(steps[i-1]);
+        prev.classList.remove('active');
+        prev.classList.add('done');
+        prev.querySelector('.step-icon').textContent = '✓';
+        prev.querySelector('.step-icon').classList.remove('pulsing');
+      }
+      const cur = document.getElementById(id);
+      cur.classList.add('active');
+      cur.querySelector('.step-icon').classList.add('pulsing');
+    }, delays[i]);
+  });
+
+  try {
+    // Build prompt
+    const systemPrompt = `You are an expert licensed electrician and estimator. When given a photo of an electrical job site, panel, or wiring, you analyze it and generate a detailed professional quote.
+
+Always respond with ONLY valid JSON in exactly this format:
+{
+  "jobTitle": "brief job description",
+  "scope": "short scope description",
+  "complexity": "Simple|Moderate|Complex",
+  "estimatedHours": number,
+  "laborItems": [
+    {"icon": "emoji", "name": "task name", "hours": number, "rate": number}
+  ],
+  "materials": [
+    {"icon": "emoji", "name": "material name", "qty": "quantity string", "unitPrice": number}
+  ],
+  "warnings": [
+    {"icon": "emoji", "text": "warning or note text"}
+  ],
+  "permitRequired": boolean,
+  "tags": ["tag1", "tag2"]
+}
+
+Use the provided labor rate. Apply realistic market pricing for materials. Include permit costs if required. Flag code violations, safety issues, or upgrade recommendations in warnings. Be specific about what you see in the photo.`;
+
+    const userContent = [];
+
+    // Add image if present
+    if (currentImage) {
+      const base64 = currentImage.split(',')[1];
+      const mimeType = currentImage.split(';')[0].split(':')[1];
+      userContent.push({
+        type: 'image',
+        source: { type: 'base64', media_type: mimeType, data: base64 }
+      });
+    }
+
+    userContent.push({
+      type: 'text',
+      text: `Generate a detailed electrical quote for this job.
+Job Type: ${currentJobType}
+Labor Rate: $${rate}/hour
+Material Markup: ${currentMarkup}
+${client ? `Client: ${client}` : ''}
+${addr ? `Address: ${addr}` : ''}
+${notes ? `Additional Notes: ${notes}` : ''}
+${!currentImage ? 'No photo provided — generate quote based on job type and notes only.' : 'Analyze the photo carefully and identify all electrical work needed.'}`
+    });
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-5',
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userContent }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'API error');
+    }
+
+    const data = await response.json();
+    let rawText = data.content[0].text.trim();
+
+    // Strip markdown code fences if present
+    rawText = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+    const quote = JSON.parse(rawText);
+    quoteData = { quote, client, addr, rate: parseFloat(rate), markup };
+
+    // Show result
+    document.getElementById('loading-section').style.display = 'none';
+    renderQuote(quote, client, addr, parseFloat(rate), markup);
+
+  } catch (err) {
+    document.getElementById('loading-section').style.display = 'none';
+    document.getElementById('form-section').style.display = 'block';
+
+    // Show error
+    const errDiv = document.createElement('div');
+    errDiv.style.cssText = 'background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;color:#ef4444';
+    errDiv.innerHTML = `<strong>Error:</strong> ${err.message}<br><br>
+      <span style="color:var(--sub)">Make sure your API key is correct. Get one at <strong style="color:white">console.anthropic.com</strong></span>`;
+    document.getElementById('form-section').prepend(errDiv);
+    setTimeout(() => errDiv.remove(), 6000);
+  }
+}
+
+// ── Render Quote ──────────────────────────────────────────────
+function renderQuote(q, client, addr, rate, markup) {
+  // Calculate totals
+  const laborTotal = (q.laborItems || []).reduce((sum, item) => sum + (item.hours * item.rate), 0);
+  const materialsBase = (q.materials || []).reduce((sum, item) => sum + (item.unitPrice * parseFloat(item.qty) || item.unitPrice), 0);
+  const materialsWithMarkup = materialsBase * (1 + markup);
+  const permitCost = q.permitRequired ? 250 : 0;
+  const subtotal = laborTotal + materialsWithMarkup + permitCost;
+  const tax = materialsWithMarkup * 0.08;
+  const total = subtotal + tax;
+
+  const qNum = 'SQ-' + Date.now().toString().slice(-6);
+  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const complexityColor = q.complexity === 'Simple' ? '#22c55e' : q.complexity === 'Moderate' ? '#f59e0b' : '#ef4444';
+
+  const html = `
+  <div class="quote-result">
+
+    <!-- Header -->
+    <div class="result-header">
+      <div>
+        <div class="result-job-title">${q.jobTitle || currentJobType}</div>
+        <div style="font-size:13px;color:var(--sub);margin-top:3px">${client ? client + ' • ' : ''}${addr || 'Quote #' + qNum}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${today}</div>
+        <div class="result-tags">
+          <span class="tag tag-scope">${q.scope || currentJobType}</span>
+          <span class="tag tag-complexity" style="color:${complexityColor};background:${complexityColor}18;border-color:${complexityColor}33">${q.complexity || 'Moderate'} complexity</span>
+          ${q.permitRequired ? '<span class="tag tag-warn">Permit Required</span>' : ''}
+          ${(q.tags || []).map(t => `<span class="tag tag-scope">${t}</span>`).join('')}
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Syne',sans-serif;font-size:11px;color:var(--muted);letter-spacing:1px">QUOTE</div>
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--gold)">#${qNum}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px">~${q.estimatedHours || '?'} hrs</div>
+      </div>
+    </div>
+
+    <!-- Labor -->
+    ${(q.laborItems || []).length > 0 ? `
+    <div class="result-section">
+      <div class="rs-title">⚡ Labor</div>
+      ${(q.laborItems || []).map((item, i) => `
+        <div class="line-item">
+          <span class="li-icon">${item.icon || '🔧'}</span>
+          <span class="li-name">${item.name}</span>
+          <span class="li-qty">${item.hours}h</span>
+          <input class="li-price-edit" value="$${(item.hours * item.rate).toFixed(0)}" id="labor-${i}" onchange="recalcTotal()" />
+        </div>`).join('')}
+      <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:13px">
+        <span style="color:var(--sub)">Labor subtotal</span>
+        <span style="font-weight:700" id="labor-subtotal">$${laborTotal.toFixed(2)}</span>
+      </div>
+    </div>` : ''}
+
+    <!-- Materials -->
+    ${(q.materials || []).length > 0 ? `
+    <div class="result-section">
+      <div class="rs-title">🧱 Materials</div>
+      ${(q.materials || []).map((item, i) => `
+        <div class="line-item">
+          <span class="li-icon">${item.icon || '📦'}</span>
+          <span class="li-name">${item.name}</span>
+          <span class="li-qty">${item.qty}</span>
+          <input class="li-price-edit" value="$${item.unitPrice.toFixed(0)}" id="mat-${i}" onchange="recalcTotal()" />
+        </div>`).join('')}
+      <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-size:13px">
+        <span style="color:var(--sub)">Materials + ${Math.round(markup*100)}% markup</span>
+        <span style="font-weight:700" id="mat-subtotal">$${materialsWithMarkup.toFixed(2)}</span>
+      </div>
+    </div>` : ''}
+
+    <!-- Totals -->
+    <div class="result-section">
+      <div class="rs-title">💰 Summary</div>
+      <div class="totals-block">
+        <div class="total-row"><span>Labor</span><span id="t-labor">$${laborTotal.toFixed(2)}</span></div>
+        <div class="total-row"><span>Materials (with markup)</span><span id="t-mat">$${materialsWithMarkup.toFixed(2)}</span></div>
+        ${q.permitRequired ? `<div class="total-row"><span>Permit (estimated)</span><span>$${permitCost.toFixed(2)}</span></div>` : ''}
+        <div class="total-row"><span>Tax (materials, 8%)</span><span id="t-tax">$${tax.toFixed(2)}</span></div>
+        <div class="total-row grand"><span>TOTAL</span><span id="t-total">$${total.toFixed(2)}</span></div>
+      </div>
+    </div>
+
+    <!-- Warnings / Notes -->
+    ${(q.warnings || []).length > 0 ? `
+    <div class="result-section" style="border-color:rgba(245,166,35,.2);background:rgba(245,166,35,.04)">
+      <div class="rs-title" style="color:var(--gold)">⚠ Findings & Recommendations</div>
+      ${(q.warnings || []).map(w => `
+        <div class="warning-item">
+          <span class="warn-icon">${w.icon || '⚠️'}</span>
+          <div class="warn-text">${w.text}</div>
+        </div>`).join('')}
+    </div>` : ''}
+
+    <!-- Actions -->
+    <div class="action-row">
+      <button class="action-btn action-print" onclick="window.print()">🖨 Print / PDF</button>
+      <button class="action-btn action-edit" onclick="editQuote()">✏️ Edit</button>
+      <button class="action-btn action-share" onclick="newQuote()">📸 New Quote</button>
+    </div>
+
+  </div>`;
+
+  const resultEl = document.getElementById('result-section');
+  resultEl.innerHTML = html;
+  resultEl.style.display = 'block';
+}
+
+function editQuote() {
+  document.getElementById('form-section').style.display = 'block';
+  document.getElementById('result-section').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+function newQuote() {
+  resetPhoto();
+  document.getElementById('result-section').innerHTML = '';
+}
+
+function recalcTotal() {
+  // Simple recalc when user edits prices
+  const laborInputs = document.querySelectorAll('[id^="labor-"]');
+  const matInputs = document.querySelectorAll('[id^="mat-"]');
+  const laborTotal = Array.from(laborInputs).reduce((s, el) => s + (parseFloat(el.value.replace('$','')) || 0), 0);
+  const matTotal = Array.from(matInputs).reduce((s, el) => s + (parseFloat(el.value.replace('$','')) || 0), 0);
+  const matMarkup = matTotal * (1 + (quoteData?.markup || 0.2));
+  const tax = matMarkup * 0.08;
+  const total = laborTotal + matMarkup + tax;
+  if (document.getElementById('t-labor')) document.getElementById('t-labor').textContent = '$' + laborTotal.toFixed(2);
+  if (document.getElementById('t-mat')) document.getElementById('t-mat').textContent = '$' + matMarkup.toFixed(2);
+  if (document.getElementById('t-tax')) document.getElementById('t-tax').textContent = '$' + tax.toFixed(2);
+  if (document.getElementById('t-total')) document.getElementById('t-total').textContent = '$' + total.toFixed(2);
+}
+
+init();
+</script>
+</body>
+</html>

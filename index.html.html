@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ElectriTools</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Barlow',sans-serif;background:#0d0d0f;color:white;min-height:100vh;padding-bottom:80px}
+input,button,select,textarea{font-family:'Barlow',sans-serif}
+a{text-decoration:none}
+input:focus,select:focus,textarea:focus{border-color:#fbbf24!important;outline:none}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+select{-webkit-appearance:none}
+button{cursor:pointer}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .2s ease forwards}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite;display:inline-block}
+
+/* Header */
+#hdr{background:#111114;border-bottom:1px solid #1e1e24;position:sticky;top:0;z-index:100}
+#hdr-in{max-width:660px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;letter-spacing:2px;color:white;line-height:1}
+.logo span{color:#fbbf24}
+.logo-sub{font-size:10px;color:#555;letter-spacing:1.5px;margin-top:2px;text-transform:uppercase}
+.hdr-stripe{height:3px;background:linear-gradient(90deg,#fbbf24,#f59e0b,#d97706)}
+#plan-btn{border:1px solid rgba(85,85,85,.3);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;background:rgba(85,85,85,.15);color:#555}
+
+/* Bottom nav */
+#bnav{position:fixed;bottom:0;left:0;right:0;z-index:200;background:#111114;border-top:1px solid #1e1e24;display:flex;height:62px;box-shadow:0 -4px 24px rgba(0,0,0,.4)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:transparent;border:none;color:#444;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;position:relative;padding:6px 4px}
+.tab.on{color:#fbbf24}
+.tab.on::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:#fbbf24;border-radius:0 0 2px 2px}
+.tab-ic{font-size:19px;line-height:1}
+
+/* Drawer */
+#overlay{position:fixed;inset:0;z-index:180;background:rgba(0,0,0,.5);display:none}
+#overlay.on{display:block}
+#drawer{position:fixed;bottom:62px;left:0;right:0;z-index:190;background:#111114;border-top:1px solid #1e1e24;transform:translateY(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);max-height:65vh;overflow-y:auto}
+#drawer.on{transform:translateY(0)}
+.drw-in{max-width:660px;margin:0 auto;padding:14px}
+.drw-ttl{font-size:10px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase;margin-bottom:10px}
+.drw-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.drw-item{display:flex;align-items:center;gap:10px;background:#16161a;border:1px solid #1e1e24;border-radius:10px;padding:11px 12px;color:#aaa;font-size:13px;font-weight:600;text-align:left;position:relative;transition:border-color .15s}
+.drw-item.on{border-color:rgba(251,191,36,.3);color:#fbbf24;background:#1e1a08}
+.drw-ic{font-size:19px}
+.drw-lock{position:absolute;top:5px;right:7px;font-size:9px;color:#444}
+
+/* Body */
+#body{max-width:660px;margin:0 auto;padding:16px 16px 10px}
+
+/* Cards */
+.card{background:#16161a;border:1px solid #1e1e24;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+.clbl{font-size:10px;font-weight:700;letter-spacing:2px;color:#444;text-transform:uppercase}
+
+/* Inputs */
+.lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;color:#555;text-transform:uppercase;margin-bottom:4px}
+.inp{width:100%;background:#0d0d0f;border:1.5px solid #2a2a30;border-radius:8px;padding:10px 42px 10px 12px;color:white;font-size:19px;font-weight:600;font-family:'Barlow Condensed',sans-serif;transition:border-color .15s}
+.inp-w{position:relative}
+.inp-u{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#444;font-size:13px;font-weight:700}
+.sel{width:100%;background:#0d0d0f;border:1.5px solid #2a2a30;border-radius:8px;padding:10px 12px;color:white;font-size:13px;transition:border-color .15s}
+textarea.inp{resize:vertical;font-size:13px;padding:10px 12px;height:70px}
+
+/* Seg */
+.segs{display:flex;gap:5px;flex-wrap:wrap}
+.seg{background:#0d0d0f;border:1.5px solid #2a2a30;border-radius:6px;padding:8px 10px;color:#555;font-size:13px;font-weight:600;text-align:center;flex:1;transition:all .15s}
+.seg.on{background:#1e1a08;border-color:#fbbf24;color:#fbbf24}
+
+/* Buttons */
+.btn{background:#fbbf24;border:none;border-radius:8px;padding:13px;color:#0d0d0f;font-size:14px;font-weight:800;letter-spacing:1.5px;font-family:'Barlow Condensed',sans-serif;width:100%}
+.add-btn{background:transparent;border:1.5px dashed #2a2a30;border-radius:8px;padding:9px;color:#555;font-size:13px;font-weight:600;width:100%}
+.rm-btn{background:none;border:none;color:#444;font-size:13px;padding:6px;border-radius:4px;flex-shrink:0}
+.mini-btn{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);border-radius:6px;padding:4px 11px;color:#fbbf24;font-size:12px;font-weight:700}
+.find-btn{background:#16161a;border:1.5px solid rgba(251,191,36,.3);border-radius:8px;padding:13px;color:#fbbf24;font-size:13px;font-weight:700;width:100%}
+
+/* Info boxes */
+.irow{display:flex;gap:8px;flex-wrap:wrap}
+.ibox{flex:1;background:#0d0d0f;border:1px solid #1e1e24;border-radius:8px;padding:9px 7px;text-align:center;min-width:60px}
+.inum{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;color:#fbbf24;line-height:1;margin-bottom:3px;word-break:break-all}
+.ilbl{font-size:10px;color:#444;letter-spacing:.3px}
+
+/* Pass/fail */
+.pass{padding:11px;border-radius:8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#22c55e;font-weight:700;font-size:14px}
+.fail{padding:11px;border-radius:8px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;font-weight:700;font-size:14px}
+
+/* Table */
+.thead{display:flex;padding:7px 10px;background:#0d0d0f;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#444;text-transform:uppercase;margin-bottom:3px}
+.trow{display:flex;align-items:center;padding:9px;border-bottom:1px solid #1a1a1f;border-radius:4px}
+.trow.hl{background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12);border-radius:6px}
+
+/* Top cards */
+.tc-row{display:flex;gap:10px;margin-bottom:4px}
+.tc{flex:1;background:#16161a;border:1px solid #1e1e24;border-radius:12px;padding:13px;display:flex;flex-direction:column;gap:3px}
+.bnum{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;color:white;line-height:1}
+.sub{font-size:11px;color:#555;margin-bottom:3px}
+.dbadge{font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;align-self:flex-start}
+
+/* Store */
+.store-a{display:flex;align-items:center;gap:10px;background:#0d0d0f;border:1.5px solid #2a2a30;border-radius:10px;padding:12px;margin-bottom:7px;color:white}
+.amz-a{display:flex;align-items:center;gap:10px;background:#0d0d0f;border:1.5px solid #2a2a30;border-radius:8px;padding:10px 12px;margin-bottom:7px;color:white}
+
+/* Status */
+.sbox{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px 0;color:#aaa;font-size:13px}
+.api-box{background:#0d0d0f;border:1px solid #2a2a30;border-radius:8px;padding:14px}
+
+/* NEC */
+.nec-item{background:#16161a;border:1px solid #1e1e24;border-radius:10px;padding:13px 15px;margin-bottom:7px;cursor:pointer;transition:border-color .15s}
+.nec-item.on{border-color:rgba(251,191,36,.4)}
+
+/* Exam */
+.opt{background:#0d0d0f;border:1.5px solid #2a2a30;border-radius:8px;padding:11px 13px;color:#aaa;font-size:13px;font-weight:500;text-align:left;width:100%;margin-bottom:7px}
+.opt.correct{background:rgba(34,197,94,.1);border-color:#22c55e;color:#22c55e}
+.opt.wrong{background:rgba(239,68,68,.1);border-color:#ef4444;color:#ef4444}
+.opt.picked{background:#1e1a08;border-color:#fbbf24;color:#fbbf24}
+
+/* Lock */
+.lock-wrap{position:relative}
+.lock-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;background:rgba(13,13,15,.9);border-radius:12px;z-index:10}
+
+/* Plan card */
+.pcard{background:#16161a;border:1px solid #1e1e24;border-radius:12px;padding:18px;margin-bottom:12px}
+
+/* NEMA */
+.nema-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nema-card{background:#0d0d0f;border:1px solid #2a2a30;border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:border-color .15s}
+.nema-card.on{border-color:#fbbf24;background:#1e1a08}
+.nema-detail{background:#0d0d0f;border:1px solid #fbbf2433;border-radius:10px;padding:16px;margin-top:10px}
+
+/* Conduit bending */
+.bend-result{background:#0d0d0f;border:1px solid #2a2a30;border-radius:8px;padding:12px;margin-top:4px}
+
+/* Conversion */
+.conv-result{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:#fbbf24;text-align:center;padding:16px 0}
+
+/* Transformer */
+.xfmr-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.xfmr-card{background:#0d0d0f;border:1px solid #2a2a30;border-radius:8px;padding:11px;cursor:pointer;transition:border-color .15s}
+.xfmr-card.on{border-color:#fbbf24;background:#1e1a08}
+
+/* Row */
+.row{display:flex;gap:10px}
+.row>div{flex:1}
+#footer{text-align:center;font-size:11px;color:#2a2a30;margin-top:20px}
+@media print{#hdr,#bnav,#drawer,#overlay,.no-print{display:none!important}body{background:white;padding:0}}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div id="hdr-in">
+    <div>
+      <div class="logo">ELECTRI<span>TOOLS</span></div>
+      <div class="logo-sub">Electrician's Toolkit</div>
+    </div>
+    <button id="plan-btn" onclick="go('pricing')">Free — Upgrade ↑</button>
+  </div>
+  <div class="hdr-stripe"></div>
+</div>
+
+<div id="overlay" onclick="closeDrawer()"></div>
+<div id="drawer">
+  <div class="drw-in">
+    <div class="drw-ttl">All Tools</div>
+    <div class="drw-grid" id="drw-grid"></div>
+  </div>
+</div>
+
+<div id="bnav">
+  <button class="tab on" id="t-wire" onclick="go('wire')"><span class="tab-ic">⚡</span>Wire</button>
+  <button class="tab" id="t-calc" onclick="go('conduit')"><span class="tab-ic">🔢</span>Calc</button>
+  <button class="tab" id="t-job" onclick="go('jobcost')"><span class="tab-ic">💰</span>Job</button>
+  <button class="tab" id="t-learn" onclick="go('nec')"><span class="tab-ic">📋</span>Learn</button>
+  <button class="tab" id="t-more" onclick="toggleDrawer()"><span class="tab-ic">⋯</span>More</button>
+</div>
+
+<div id="body">
+  <div id="tc"></div>
+  <div id="footer">ElectriTools • NEC 2023 • Always verify with a licensed electrician</div>
+</div>
+
+<script>
+const GKEY="YOUR_API_KEY_HERE";
+let plan="free",tool="wire";
+const PLANS={free:{l:"Free",p:0,c:"#555"},pro:{l:"Pro",p:9,c:"#fbbf24"},teams:{l:"Teams",p:19,c:"#60a5fa"}};
+const ORD=["free","pro","teams"];
+const ok=t=>ORD.indexOf(plan)>=ORD.indexOf(t);
+
+/* ── Electrical data ── */
+const CAMP={14:15,12:20,10:30,8:50,6:65,4:85,3:100,2:115,1:130,"1/0":150,"2/0":175,"3/0":200,"4/0":230};
+const AAMP={12:15,10:25,8:40,6:50,4:65,3:75,2:90,1:100,"1/0":120,"2/0":135,"3/0":155,"4/0":180};
+const CRES={14:3.14,12:1.98,10:1.24,8:.778,6:.491,4:.308,3:.245,2:.194,1:.154,"1/0":.122,"2/0":.0967,"3/0":.0766,"4/0":.0608};
+const ARES={12:3.25,10:2.04,8:1.28,6:.808,4:.508,3:.403,2:.319,1:.253,"1/0":.201,"2/0":.159,"3/0":.126,"4/0":.100};
+const GO=[14,12,10,8,6,4,3,2,1,"1/0","2/0","3/0","4/0"];
+const BR={14:15,12:20,10:30,8:40,6:60,4:90,3:100,2:115,1:130,"1/0":150,"2/0":175,"3/0":200,"4/0":230};
+const WT={14:{t:["NM-B 14/2","THHN 14"],c:'1/2" EMT'},12:{t:["NM-B 12/2","THHN 12"],c:'1/2" EMT'},10:{t:["NM-B 10/2","THHN 10"],c:'1/2" EMT'},8:{t:["THHN 8"],c:'3/4" EMT'},6:{t:["THHN 6"],c:'3/4" EMT'},4:{t:["THHN 4"],c:'1" EMT'},3:{t:["THHN 3"],c:'1" EMT'},2:{t:["THHN 2"],c:'1" EMT'},1:{t:["THHN 1"],c:'1-1/4" EMT'},"1/0":{t:["THHN 1/0"],c:'1-1/4" EMT'},"2/0":{t:["THHN 2/0"],c:'1-1/2" EMT'},"3/0":{t:["THHN 3/0"],c:'2" EMT'},"4/0":{t:["THHN 4/0"],c:'2" EMT'}};
+const CA={"1/2 EMT":.304,"3/4 EMT":.533,"1 EMT":.864,"1-1/4 EMT":1.496,"1-1/2 EMT":2.036,"2 EMT":3.356,"2-1/2 EMT":5.858,"3 EMT":8.846,"1/2 PVC":.285,"3/4 PVC":.508,"1 PVC":.832,"1-1/4 PVC":1.453,"1-1/2 PVC":1.986,"2 PVC":3.291};
+const WA={"14 THHN":.0097,"12 THHN":.0133,"10 THHN":.0211,"8 THHN":.0366,"6 THHN":.0507,"4 THHN":.0824,"3 THHN":.0973,"2 THHN":.1158,"1 THHN":.1562,"1/0 THHN":.1855,"2/0 THHN":.2223,"3/0 THHN":.2679,"4/0 THHN":.3237};
+const BFV={"14 AWG":2.0,"12 AWG":2.25,"10 AWG":2.5,"8 AWG":3.0};
+const BOXES=[{n:'2x4 Shallow',v:10.5},{n:'2x4 Deep',v:14.5},{n:'2x4 Extra Deep',v:21.0},{n:'4x4 Square 1.5"',v:21.0},{n:'4x4 Square 2.1"',v:30.3},{n:'4" Octagon 1.5"',v:15.5},{n:'4" Octagon 2.1"',v:21.5}];
+const M3={".5":1.1,".75":1.6,"1":2.1,"1.5":3.0,"2":3.4,"3":4.8,"5":7.6,"7.5":11,"10":14,"15":21,"20":27,"25":34,"30":40,"40":52,"50":65,"75":96,"100":124};
+const M1={".5":5.8,".75":7.2,"1":9.8,"1.5":13.8,"2":16,"3":20,"5":28,"7.5":44,"10":50};
+const MP={"12 THHN/ft":.28,"10 THHN/ft":.45,"8 THHN/ft":.72,"6 THHN/ft":1.15,"NM-B 12/2/ft":.55,"NM-B 14/2/ft":.38,"1/2in EMT/ft":.65,"3/4in EMT/ft":.95,"1in EMT/ft":1.45,"1/2in connector":.85,"3/4in connector":1.10,"20A outlet":3.50,"15A outlet":2.25,"GFCI outlet":14.99,"AFCI breaker":42.00,"20A breaker":8.50,"15A breaker":6.50,"30A 2-pole":18.00,"Single gang box":1.25,"4in square box":2.75,"Wire nuts/100":6.99};
+
+/* NEMA wiring configurations */
+const NEMA=[
+  {id:"5-15",v:"125V",a:"15A",p:2,use:"Standard 15A household receptacle",pin:"Hot(B), Neutral(W), Ground(G)",color:"#22c55e"},
+  {id:"5-20",v:"125V",a:"20A",p:2,use:"Kitchen/bath 20A circuits — T-slot neutral",pin:"Hot(B), Neutral(W) T-slot, Ground(G)",color:"#22c55e"},
+  {id:"6-15",v:"250V",a:"15A",p:2,use:"240V 15A — some older AC units, tools",pin:"Hot1(B), Hot2(R), Ground(G)",color:"#f59e0b"},
+  {id:"6-20",v:"250V",a:"20A",p:2,use:"240V 20A — air compressors, welders",pin:"Hot1(B), Hot2(R), Ground(G)",color:"#f59e0b"},
+  {id:"10-30",v:"125/250V",a:"30A",p:3,use:"Old-style dryer outlet — NO ground (deprecated)",pin:"Hot1(B), Hot2(R), Neutral(W) — No ground!",color:"#ef4444"},
+  {id:"14-30",v:"125/250V",a:"30A",p:4,use:"Modern dryer — 30A, 4-wire",pin:"Hot1(B), Hot2(R), Neutral(W), Ground(G)",color:"#22c55e"},
+  {id:"10-50",v:"125/250V",a:"50A",p:3,use:"Old-style range — NO ground (deprecated)",pin:"Hot1(B), Hot2(R), Neutral(W) — No ground!",color:"#ef4444"},
+  {id:"14-50",v:"125/250V",a:"50A",p:4,use:"Electric range, EV charger — 50A, 4-wire",pin:"Hot1(B), Hot2(R), Neutral(W), Ground(G)",color:"#22c55e"},
+  {id:"L6-20",v:"250V",a:"20A",p:2,use:"Locking 240V — generators, industrial",pin:"Hot1(B), Hot2(R), Ground(G)",color:"#60a5fa"},
+  {id:"L6-30",v:"250V",a:"30A",p:2,use:"Locking 240V 30A — HVAC, generators",pin:"Hot1(B), Hot2(R), Ground(G)",color:"#60a5fa"},
+  {id:"L14-30",v:"125/250V",a:"30A",p:4,use:"Locking 4-wire 30A — generator transfer",pin:"Hot1(B), Hot2(R), Neutral(W), Ground(G)",color:"#60a5fa"},
+  {id:"L14-50",v:"125/250V",a:"50A",p:4,use:"Locking 4-wire 50A — large generators, RVs",pin:"Hot1(B), Hot2(R), Neutral(W), Ground(G)",color:"#60a5fa"},
+  {id:"L5-30",v:"125V",a:"30A",p:2,use:"Locking 120V 30A — UPS, some generators",pin:"Hot(B), Neutral(W), Ground(G)",color:"#60a5fa"},
+  {id:"SS2-50",v:"125/250V",a:"50A",p:4,use:"RV shore power — 50A campground hookup",pin:"Hot1(B), Hot2(R), Neutral(W), Ground(G)",color:"#a78bfa"},
+];
+
+/* NEC articles */
+const NECS=[
+  {a:"90",t:"Introduction",s:"Covers electrical conductors and equipment in buildings. Does NOT cover utility equipment, ships, vehicles. NEC is a minimum standard — AHJ may impose stricter rules. Revised every 3 years."},
+  {a:"100",t:"Definitions",s:"Branch Circuit: Conductors from final OCP to outlets.\nContinuous Load: 3+ hours — size at 125%.\nFeeder: Conductors from service to branch circuit OCP.\nAmpacity: Max current without exceeding temp rating.\nEGC: Equipment ground — safety ground (green or bare).\nGrounded Conductor: Neutral (white/gray)."},
+  {a:"110",t:"Requirements for Electrical Installations",s:"Working Space: Min 3 ft depth, 30 in wide, 6.5 ft high in front of panels. No storage.\nTemp Ratings: Most terminations 75C. Never use 90C column for termination sizing — derating only.\nAll disconnects must be labeled. Equipment must be securely fastened."},
+  {a:"200",t:"Use and ID of Grounded Conductors",s:"Neutral must be white or gray. White wire used as hot must be retaped black.\nSub-panels: Neutral MUST be isolated. Remove green bonding screw. Separate neutral and ground bars.\nMWBC circuits must use 2-pole breaker or handle ties."},
+  {a:"210",t:"Branch Circuits",s:"Receptacles: No point along wall more than 6 ft from outlet — max 12 ft apart.\nGFCI: Bathrooms, garages, outdoors, basements, kitchens within 6 ft of sink, near pools.\nAFCI: All 15/20A 120V circuits in most dwelling rooms.\nKitchen: Min 2 small appliance 20A circuits. Laundry: 1 dedicated 20A.\nVoltage Drop: Max 3% branch, 5% total."},
+  {a:"215",t:"Feeders",s:"Size for calculated load, min 100A for single-family dwellings.\nVoltage Drop: Max 3% recommended — upsize for long runs.\nSub-panel feeders must include EGC unless in continuous metal conduit.\nNeutral must be isolated in sub-panel — never bond to ground."},
+  {a:"220",t:"Branch Circuit, Feeder and Service Calcs",s:"Dwelling Load (Optional 220.82):\n- Lighting: 3 VA per sq ft\n- Small appliance: 1500 VA per circuit (min 2)\n- Laundry: 1500 VA\nDemand Factors: First 3000 VA at 100%, 3001-120,000 VA at 35%, remainder at 25%.\nAC vs Heat: Use 100% of the larger only."},
+  {a:"230",t:"Services",s:"Min service: 100A for single-family dwellings.\nOverhead Clearances: 3 ft above rooftops, 10 ft above driveways, 12 ft above walkways, 18 ft above streets.\nService Disconnect: Nearest entry point, max 6 disconnects. Must open all ungrounded conductors.\nBurial Depths: RMC=6 in, PVC=18 in, direct burial=24 in."},
+  {a:"240",t:"Overcurrent Protection",s:"Standard Ratings: 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100, 110, 125, 150, 175, 200, 225, 250A.\nAbsolute Max: 14 AWG=15A, 12 AWG=20A, 10 AWG=30A. Cannot upsize these.\nNext-Size-Up (240.4(B)): Allowed for larger conductors."},
+  {a:"250",t:"Grounding and Bonding",s:"GES: Use all available electrodes — Ufer (20 ft rebar), water pipe (10 ft), ground rods (8 ft min).\nGEC Sizing (250.66): 4/0 service=2 AWG, 350 kcmil=4 AWG, max=3/0 AWG.\nEGC Sizing (250.122): 15A=14, 20A=12, 30A=10, 60A=10, 100A=8, 200A=6 AWG.\nMain panel: Bond neutral to ground. Sub-panel: Isolate neutral NEVER bond."},
+  {a:"310",t:"Conductors for General Wiring",s:"Table 310.16 Copper at 75C:\n14=20A, 12=25A, 10=35A, 8=50A, 6=65A, 4=85A, 2=115A, 1/0=150A, 2/0=175A, 4/0=230A.\nUse 75C column for sizing. 90C for derating math only.\nDerating: 4-6 conductors=80%, 7-9=70%, 10-20=50%."},
+  {a:"314",t:"Outlet, Device, Pull and Junction Boxes",s:"Box Fill: 14 AWG=2.0 in3, 12 AWG=2.25 in3, 10 AWG=2.5 in3.\nCount: Each conductor=1, each device=2, all grounds=1, all clamps=1.\nCommon volumes: 2x4 shallow=10.5, 2x4 deep=14.5, 4x4 square=21.0 in3.\nAll boxes need covers. Junction boxes must be accessible."},
+  {a:"334",t:"Nonmetallic-Sheathed Cable NM-B",s:"Permitted: Single/multifamily dwellings up to 3 floors, dry locations only.\nNOT Permitted: Commercial buildings, 4+ story residential, wet/damp locations, physical damage areas.\nSecure within 12 in of every box. Support every 4.5 ft. Nail plates within 1.25 in of framing."},
+  {a:"358",t:"Electrical Metallic Tubing EMT",s:"Most common interior conduit. Set-screw or compression fittings.\nSupport: Within 3 ft of boxes/fittings, max 10 ft intervals.\nCompression fittings for wet. Set-screw for dry only.\nEMT serves as EGC — keep fittings tight.\nFill: 40% for 3+, 31% for 2, 53% for 1 conductor."},
+  {a:"404",t:"Switches",s:"Always switch the HOT only — never the neutral.\nWet/outdoor: In-use bubble covers required outdoors.\nDimmers must match load type — LED dimmers for LED fixtures.\nAll metal boxes and switch yokes must be grounded."},
+  {a:"406",t:"Receptacles",s:"GFCI Required: Bathrooms, garages, outdoors, crawl spaces, unfinished basements, kitchens within 6 ft of sink.\nTamper Resistant (406.12): ALL 15/20A 125V receptacles in dwelling units must be TR.\nNo Ground: Must use GFCI protection and label 'No Equipment Ground'.\n15A receptacle allowed on 20A circuit except single receptacle on dedicated 20A circuit."},
+  {a:"408",t:"Panelboards",s:"Circuit Directory: Required — label each circuit. Mount in/on door.\nWorking Space: 3 ft depth, 30 in wide, 6.5 ft high. No storage.\nMax Circuits: 42 overcurrent devices per panelboard.\nSub-Panel: Remove green bonding screw. Isolated neutral bus. Never bond neutral to ground."},
+  {a:"430",t:"Motors",s:"Use NEC Table FLA (NOT nameplate) for conductor/breaker sizing. Use nameplate FLA for overload relay.\nConductors (430.22): Min 125% of NEC table FLA.\nBreaker (430.52): Max 250% FLA for inverse time breaker.\nOverloads (430.32): 115% nameplate FLA (SF 1.15+), others 125%.\nDisconnect: Within sight of motor (50 ft max), lockable open."},
+  {a:"440",t:"AC and Refrigerating Equipment",s:"Always use nameplate MCA and MOCP — not calculated values.\nMCA: Minimum Circuit Ampacity — size conductors at or above this.\nMOCP: Max Overcurrent Protection — never exceed this.\nDisconnect (440.14): Must be within sight of AC unit.\nAll outdoor units need weatherproof fittings and EGC to equipment."},
+  {a:"445",t:"Generators",s:"NEVER backfeed a panel without a transfer switch — it energizes utility lines.\nPortable: No earth ground needed if GFCI protected and not connected to fixed wiring.\nSize: 125% of continuous loads. Account for motor starting surges.\nExhaust: CO risk. Never operate indoors. Place 20+ ft from any opening."},
+  {a:"690",t:"Solar Photovoltaic PV Systems",s:"Rapid Shutdown: Required for all rooftop PV — de-energize within 30 seconds at service entrance.\nArc Fault: PV AFCI required for rooftop systems.\nBackfeed Breaker: Opposite end of bus from main. Bus must be rated for combined amperage.\nExtensive labeling required on all components."},
+];
+
+/* Exam questions */
+const EQ=[
+  {q:"Max recommended voltage drop for branch circuits?",o:["2%","3%","5%","10%"],a:1,r:"NEC 210.19(A) FPN"},
+  {q:"Conductor size for a 20-amp branch circuit?",o:["14 AWG","12 AWG","10 AWG","8 AWG"],a:1,r:"NEC Table 310.16"},
+  {q:"GFCI required in all EXCEPT:",o:["Bathrooms","Kitchen within 6ft of sink","Dedicated freezer in garage","Outdoor receptacles"],a:2,r:"NEC 210.8"},
+  {q:"Standard color for grounded (neutral) conductor?",o:["Green","Black","White or Gray","Red"],a:2,r:"NEC 200.6"},
+  {q:"Min working clearance in front of 120V panelboard?",o:["2 feet","3 feet","4 feet","6 feet"],a:1,r:"NEC 110.26(A)(1)"},
+  {q:"Motor branch circuit conductors minimum sizing?",o:["100% FLA","115% FLA","125% FLA","150% FLA"],a:2,r:"NEC 430.22"},
+  {q:"A continuous load is defined as lasting:",o:["30 minutes or more","1 hour or more","2 hours or more","3 hours or more"],a:3,r:"NEC Article 100"},
+  {q:"EMT must be supported within how many feet of each box?",o:["1 foot","2 feet","3 feet","5 feet"],a:2,r:"NEC 358.30"},
+  {q:"Maximum fill for 3 or more conductors in conduit?",o:["31%","40%","53%","60%"],a:1,r:"NEC Chapter 9 Table 1"},
+  {q:"AFCI protection now required for:",o:["Bathrooms only","Garages only","Kitchen and laundry only","Most 15/20A circuits in dwellings"],a:3,r:"NEC 210.12"},
+  {q:"Ampacity of 12 AWG copper THHN at 75C?",o:["20A","25A","30A","35A"],a:1,r:"NEC Table 310.16"},
+  {q:"Maximum breaker size for 14 AWG copper?",o:["15A","20A","25A","30A"],a:0,r:"NEC 240.4(D)"},
+  {q:"NM-B (Romex) is NOT permitted in:",o:["Single family homes","Multifamily up to 3 floors","Commercial buildings","Finished basements"],a:2,r:"NEC 334.10"},
+  {q:"Small appliance branch circuits required in a kitchen?",o:["1","2","3","4"],a:1,r:"NEC 210.11(C)(1)"},
+  {q:"Grounding electrode conductor for 200A service?",o:["6 AWG Cu","4 AWG Cu","2 AWG Cu","1/0 AWG Cu"],a:1,r:"NEC Table 250.66"},
+  {q:"General lighting load for dwelling units?",o:["2 VA/sqft","3 VA/sqft","4 VA/sqft","5 VA/sqft"],a:1,r:"NEC Table 220.12"},
+  {q:"EMT max support interval?",o:["6 feet","8 feet","10 feet","12 feet"],a:2,r:"NEC 358.30(A)"},
+  {q:"Continuous loads sized at what percent of breaker rating?",o:["80%","90%","100%","125%"],a:0,r:"NEC 210.20(A)"},
+  {q:"Motor overcurrent protection max (induction motor)?",o:["125% FLA","150% FLA","200% FLA","250% FLA"],a:3,r:"NEC 430.52"},
+  {q:"NEMA 14-50 receptacle is rated for:",o:["125V 50A","250V 50A","125/250V 30A","125/250V 50A"],a:3,r:"NEMA Standards"},
+];
+
+/* Transformer data */
+const XFMRS=[
+  {id:"1ph-step",t:"Single Phase Step-Down",v:"Primary: 240V → Secondary: 120V",use:"Most common residential transformer. Used for stepping 240V down to 120V for appliances.",wire:"Primary: connect to H1 and H2 taps. Secondary: X1=hot, X2=neutral. Bond X2 to ground at secondary panel.",img:"◻ H1──┤XFMR├──X1\n◻ H2──┤    ├──X2(N)"},
+  {id:"1ph-dual",t:"Single Phase Dual Voltage",v:"Primary: 120/240V | Secondary: 120/240V",use:"Versatile transformer with dual primary and secondary taps. Can be connected various ways.",wire:"Series connection (240V primary): H1-H2 in series. Parallel (120V primary): H1-H2 in parallel with jumper.",img:"Series: H1-H3-H2 → X1-X3-X2\nParallel: H1+H3, H2+H4 → same secondary"},
+  {id:"3ph-delta-wye",t:"3-Phase Delta-Wye",v:"Primary: Delta | Secondary: Wye (4-wire)",use:"Most common commercial/industrial transformer. Creates a neutral. Secondary gives 208/120V or 480/277V.",wire:"Primary (delta): H1-H2-H3 across each phase. Secondary (wye): X1-X2-X3 phases, X0=neutral bonded to ground.",img:"Delta Primary: △ H1-H2-H3\nWye Secondary: Y X1-X2-X3 + X0(N)"},
+  {id:"3ph-wye-delta",t:"3-Phase Wye-Delta",v:"Primary: Wye | Secondary: Delta (3-wire)",use:"Used for motors and loads that do not need a neutral. No neutral on secondary.",wire:"Primary (wye): H1-H2-H3 with H0 neutral. Secondary (delta): X1-X2-X3, no neutral.",img:"Wye Primary: Y H1-H2-H3 + H0(N)\nDelta Secondary: △ X1-X2-X3"},
+  {id:"3ph-delta-delta",t:"3-Phase Delta-Delta",v:"Primary: Delta | Secondary: Delta",use:"Industrial applications. Secondary has no neutral. One secondary phase may be center-tapped for 120V (high-leg delta).",wire:"Primary: H1-H2-H3. Secondary: X1-X2-X3. High-leg delta: center tap X2 gives 208V to neutral (must be orange).",img:"High-leg delta: X2 = 208V to neutral\nOrange wire required for high leg"},
+  {id:"autoxfmr",t:"Autotransformer",v:"Variable — single winding",use:"Buck-boost applications. Voltage correction, small voltage changes. NOT isolation — shares winding.",wire:"Series winding and common winding share same coil. H1-H2 input, X1-X2 output (boost) or reverse (buck).",img:"Buck: reduces voltage by series opposition\nBoost: raises voltage by series aiding"},
+];
+
+/* State */
+const S={
+  wire:{amps:"",dist:"",vol:120,mat:"Copper",phase:"Single Phase",res:null,stab:"nearby",sst:"idle",stores:[]},
+  conduit:{cond:"1/2 EMT",wires:[{g:"12 THHN",q:1}]},
+  ohms:{mode:"V",v:"",i:"",r:"",p:""},
+  load:{loads:[{n:"",a:"",cont:false}],vol:120,phase:"Single Phase"},
+  box:{box:BOXES[0].n,gauge:"14 AWG",cond:"",dev:"",gnd:"",clamp:false},
+  motor:{hp:"",phase:"3-Phase",vol:460},
+  tp:{mode:"find-amps",kva:"",kw:"",amps:"",vol:480,pf:"0.85"},
+  jc:{items:[{d:"Labor",q:"",u:"hrs",p:"",cat:"labor"}],oh:"15",pr:"20",cl:""},
+  mat:{items:[{m:Object.keys(MP)[0],q:""}]},
+  nec:{s:"",open:null},
+  exam:{i:0,sel:null,sc:{c:0,t:0},done:false},
+  quote:{biz:"",cl:"",addr:"",email:"",ph:"",items:[{d:"",q:1,u:"each",p:""}],notes:"",prev:false},
+  nema:{sel:null},
+  bend:{type:"offset",size:"1/2",offset:"",dist:""},
+  conv:{cat:"length",val:"",from:"ft",to:"m"},
+  xfmr:{sel:null},
+};
+
+/* ── Helpers ── */
+function dc(p){return p<=2?"#22c55e":p<=3?"#f59e0b":"#ef4444"}
+function dl(p){return p<=2?"Excellent":p<=3?"Acceptable":"Too High"}
+function enc(s){return encodeURIComponent(s)}
+function gv(id){const e=document.getElementById(id);return e?e.value:""}
+function ss(k,v){const p=k.split(".");let o=S;for(let i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=v;R()}
+
+function wr(amps,d,vol,mat,ph){
+  const at=mat==="copper"?CAMP:AAMP,rt=mat==="copper"?CRES:ARES,m=ph==="3ph"?Math.sqrt(3):2;
+  return GO.filter(g=>at[g]&&at[g]>=amps&&rt[g]).map(g=>{const vd=(m*amps*rt[g]*d)/1000;return{g,amp:at[g],vd,pct:(vd/vol)*100}});
+}
+
+/* ── HTML helpers ── */
+function card(h,s=""){return`<div class="card" style="${s}">${h}</div>`}
+function cl(t,c="#444"){return`<div class="clbl" style="color:${c}">${t}</div>`}
+function ib(v,l,c="#fbbf24"){return`<div class="ibox"><div class="inum" style="color:${c}">${v}</div><div class="ilbl">${l}</div></div>`}
+function segs(k,opts,val,sm=false){
+  return`<div class="segs">${opts.map(o=>`<button class="seg${o==val?" on":""}" onclick="ss(${JSON.stringify(k)},${JSON.stringify(o)})" style="font-size:${sm?11:13}px">${o}</button>`).join("")}</div>`
+}
+function ni(id,lbl,val,unit="",ph="0"){
+  return`<div><div class="lbl">${lbl}</div><div class="inp-w"><input class="inp" type="number" id="${id}" value="${val||""}" placeholder="${ph}" oninput="onI()"/>${unit?`<span class="inp-u">${unit}</span>`:""}</div></div>`
+}
+function ti(id,lbl,val,ph=""){
+  return`<div>${lbl?`<div class="lbl">${lbl}</div>`:""}
+  <input class="inp" id="${id}" value="${val||""}" placeholder="${ph}" style="font-size:14px;padding:9px 12px" oninput="onI()"/></div>`
+}
+function btn(t,fn,bg="#fbbf24",c="#0d0d0f"){return`<button class="btn" style="background:${bg};color:${c}" onclick="${fn}">${t}</button>`}
+function onI(){}
+
+/* ── NEMA ── */
+function rNema(){
+  const s=S.nema;
+  const detail=s.sel!=null?NEMA[s.sel]:null;
+  return card(`${cl("NEMA Wiring Configurations")}
+    <div style="font-size:12px;color:#555">Tap any configuration to see wiring details</div>
+    <div class="nema-grid">
+      ${NEMA.map((n,i)=>`<button class="nema-card${s.sel===i?" on":""}" onclick="S.nema.sel=S.nema.sel===${i}?null:${i};R()">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:${n.color}">NEMA ${n.id}</div>
+        <div style="font-size:12px;color:#aaa;margin-top:3px">${n.v} / ${n.a}</div>
+        <div style="font-size:11px;color:#555;margin-top:2px">${n.p}-wire</div>
+      </button>`).join("")}
+    </div>
+    ${detail?`<div class="nema-detail">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:${detail.color}">NEMA ${detail.id}</div>
+        <div style="font-size:12px;color:#aaa">${detail.v} — ${detail.a}</div>
+      </div>
+      <div style="font-size:13px;color:#aaa;margin-bottom:8px;line-height:1.6"><strong style="color:white">Use:</strong> ${detail.use}</div>
+      <div style="background:#16161a;border-radius:8px;padding:11px;margin-bottom:8px">
+        <div class="lbl" style="margin-bottom:5px">Wire Connections</div>
+        <div style="font-size:13px;color:#fbbf24;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:600">${detail.pin}</div>
+      </div>
+      ${detail.color==="#ef4444"?`<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px;font-size:12px;color:#ef4444">⚠ Deprecated — not code compliant for new installations. Replace with 4-wire configuration.</div>`:""}
+    </div>`:""}
+  `)
+}
+
+/* ── Conduit Bending ── */
+const BMULT={".5":{offset:6.4,sad:2.5},".75":{offset:6.4,sad:2.5},"1":{offset:6.0,sad:2.5},"1.25":{offset:5.7,sad:2.5},"1.5":{offset:5.3,sad:2.5},"2":{offset:5.0,sad:2.5}};
+const BDEG={10:.175,22.5:.383,30:.500,45:.707,60:.866};
+
+function rBend(){
+  const s=S.bend;
+  const offset=parseFloat(s.offset)||0;
+  const dist=parseFloat(s.dist)||0;
+  const mult=BMULT[s.size]||{offset:6.0,sad:2.5};
+
+  let results="";
+  if(s.type==="offset"&&offset>0){
+    const deg45=offset/mult.offset*6.4;
+    const shrink=offset*.25;
+    results=`<div class="bend-result">
+      <div class="lbl" style="margin-bottom:8px">45° Offset — Rise: ${offset}"</div>
+      <div class="irow">
+        ${ib((offset/mult.offset*6.4).toFixed(2)+'"',"Mark Distance")}
+        ${ib(shrink.toFixed(3)+'"',"Shrink")}
+        ${ib("45°","Both Bends")}
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:#555;line-height:1.8">
+        1. Mark at ${(offset/mult.offset*3.2).toFixed(2)}" from end<br>
+        2. Bend to 45°<br>
+        3. Mark ${(offset/mult.offset*6.4).toFixed(2)}" from first bend<br>
+        4. Roll conduit 180°, bend to 45°<br>
+        5. Subtract ${shrink.toFixed(3)}" from cut length
+      </div>
+    </div>`;
+  } else if(s.type==="stub"&&offset>0){
+    const degMult=6.0;
+    const mark=offset-(degMult);
+    results=`<div class="bend-result">
+      <div class="lbl" style="margin-bottom:8px">Stub-Up — Height: ${offset}"</div>
+      <div class="irow">
+        ${ib(Math.max(0,mark).toFixed(2)+'"',"Mark from end")}
+        ${ib("90°","Bend angle")}
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:#555;line-height:1.8">
+        1. Subtract take-up (${degMult}") from stub height<br>
+        2. Mark ${Math.max(0,mark).toFixed(2)}" from end of conduit<br>
+        3. Place arrow at mark, bend to 90°<br>
+        <strong style="color:#fbbf24">Take-up by size:</strong> 1/2"=6", 3/4"=6", 1"=6", 1-1/4"=8", 1-1/2"=8", 2"=8"
+      </div>
+    </div>`;
+  } else if(s.type==="backtoback"&&offset>0&&dist>0){
+    const tu=s.size==="1.25"||s.size==="1.5"?8:s.size==="2"?8:6;
+    const m1=offset-tu;
+    const m2=m1+dist;
+    results=`<div class="bend-result">
+      <div class="lbl" style="margin-bottom:8px">Back-to-Back — Stub: ${offset}" | Distance: ${dist}"</div>
+      <div class="irow">
+        ${ib(m1.toFixed(2)+'"',"First mark")}
+        ${ib(m2.toFixed(2)+'"',"Second mark")}
+        ${ib("90°+90°","Both bends")}
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:#555;line-height:1.8">
+        1. Mark ${m1.toFixed(2)}" from end (subtract take-up ${tu}")<br>
+        2. Bend first 90°<br>
+        3. Mark ${m2.toFixed(2)}" from end on same side<br>
+        4. Flip 180°, bend second 90°
+      </div>
+    </div>`;
+  } else if(s.type==="saddle"&&offset>0){
+    const deg45mark=offset*.5;
+    const deg22mark=offset*.125;
+    results=`<div class="bend-result">
+      <div class="lbl" style="margin-bottom:8px">3-Point Saddle — Obstacle Height: ${offset}"</div>
+      <div class="irow">
+        ${ib((offset*.5).toFixed(2)+'"',"Center mark")}
+        ${ib((offset*.125).toFixed(2)+'"',"Side marks")}
+        ${ib("45°+22.5°+22.5°","Bend angles")}
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:#555;line-height:1.8">
+        1. Mark center of obstacle on conduit<br>
+        2. Bend center mark to 45°<br>
+        3. Mark ${(offset*.125).toFixed(2)}" on each side of center<br>
+        4. Flip conduit, bend each side mark to 22.5°<br>
+        5. Shrink = ${(offset*.083).toFixed(3)}"
+      </div>
+    </div>`;
+  }
+
+  return card(`${cl("Conduit Bending Calculator")}
+    <div><div class="lbl">BEND TYPE</div>${segs("bend.type",["offset","stub","backtoback","saddle"],s.type,true)}</div>
+    <div class="row">
+      <div><div class="lbl">CONDUIT SIZE</div>${segs("bend.size",["1/2",".75","1","1.25","1.5","2"],s.size,true)}</div>
+    </div>
+    <div class="row">
+      ${s.type==="backtoback"?ni("b-off",s.type==="stub"?"STUB HEIGHT":"OFFSET/STUB HEIGHT",s.offset,'"'):ni("b-off",s.type==="stub"?"STUB HEIGHT":s.type==="saddle"?"OBSTACLE HEIGHT":"OFFSET HEIGHT",s.offset,'"')}
+      ${s.type==="backtoback"?ni("b-dist","DISTANCE BETWEEN BENDS",s.dist,'"'):""}
+    </div>
+    ${btn("CALCULATE","calcBend()")}
+    ${results}
+    <div style="font-size:11px;color:#444;line-height:1.8;background:#0d0d0f;border-radius:8px;padding:10px;margin-top:4px">
+      <strong style="color:#555">Common multipliers:</strong><br>
+      10° bend = 6.0 | 22.5° = 2.6 | 30° = 2.0 | 45° = 1.4 | 60° = 1.2<br>
+      Offset shrink: height × 0.25 (at 45°) | 0.06 (at 30°) | 0.32 (at 60°)
+    </div>
+  `)
+}
+
+function calcBend(){
+  S.bend.offset=gv("b-off");S.bend.dist=gv("b-dist");R();
+}
+
+/* ── Conversion tables ── */
+const CONVS={
+  length:{units:["ft","m","in","cm","mm","yd"],conv:{ft:1,m:.3048,in:.0833,cm:.030480,mm:.00305,yd:3}},
+  area:{units:["sqft","sqm","sqin","acre","sqyd"],conv:{sqft:1,sqm:.0929,sqin:144,acre:43560,sqyd:.111}},
+  power:{units:["W","kW","HP","BTU/hr","VA"],conv:{W:1,kW:.001,HP:.001341,BTU:3.412,"VA":1}},
+  voltage:{units:["V","kV","mV"],conv:{V:1,kV:.001,mV:1000}},
+  current:{units:["A","mA","kA"],conv:{A:1,mA:1000,kA:.001}},
+  temp:{units:["F","C","K"],conv:null},
+  wire:{units:["14 AWG","12 AWG","10 AWG","8 AWG","6 AWG","4 AWG","2 AWG","1/0","2/0","4/0"],conv:null},
+  cmils:{units:["4110","6530","10380","16510","26240","41740","66360","105600","133100","211600"],conv:null},
+};
+const WIRE_CMIL={"14 AWG":4110,"12 AWG":6530,"10 AWG":10380,"8 AWG":16510,"6 AWG":26240,"4 AWG":41740,"2 AWG":66360,"1/0":105600,"2/0":133100,"4/0":211600};
+
+function rConv(){
+  const s=S.conv;
+  const cat=CONVS[s.cat];
+  const val=parseFloat(s.val)||0;
+  let result="";
+
+  if(s.cat==="temp"&&val){
+    const c=s.from==="F"?(val-32)*5/9:s.from==="C"?val:val-273.15;
+    const f=c*9/5+32,k=c+273.15;
+    result=`<div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+      ${[["°F",f.toFixed(2)],["°C",c.toFixed(2)],["K",k.toFixed(2)]].map(([u,v])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#0d0d0f;border-radius:8px;border:1px solid #1e1e24">
+        <span style="color:#555;font-size:13px">${u}</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:#fbbf24">${v}</span>
+      </div>`).join("")}
+    </div>`;
+  } else if(s.cat==="wire"&&s.from){
+    const cm=WIRE_CMIL[s.from]||0;
+    const sqin=(cm*Math.PI/4)*1e-6;
+    result=`<div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+      ${[[`${s.from}`,s.from],[`Circular Mils`,cm.toLocaleString()],["sq inches",(cm/1273240).toFixed(6)],["sq mm",((cm/1273240)*645.16).toFixed(4)]].map(([l,v])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#0d0d0f;border-radius:8px;border:1px solid #1e1e24"><span style="color:#555;font-size:13px">${l}</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;color:#fbbf24">${v}</span></div>`).join("")}
+    </div>`;
+  } else if(cat&&cat.conv&&val){
+    const baseVal=val*cat.conv[s.from];
+    result=`<div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+      ${cat.units.map(u=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#0d0d0f;border-radius:8px;border:1px solid #1e1e24">
+        <span style="color:#555;font-size:13px">${u}</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:${u===s.from?"#fbbf24":"white"}">${(baseVal/cat.conv[u]).toFixed(4)}</span>
+      </div>`).join("")}
+    </div>`;
+  }
+
+  const cats=["length","area","power","voltage","current","temp","wire"];
+  const catIcons={length:"📏",area:"⬛",power:"⚡",voltage:"🔋",current:"〰️",temp:"🌡️",wire:"🔌"};
+  return card(`${cl("Conversion Tables")}
+    <div><div class="lbl">CATEGORY</div>
+    <div class="segs" style="flex-wrap:wrap">${cats.map(c=>`<button class="seg${s.cat===c?" on":""}" onclick="S.conv.cat='${c}';S.conv.val='';R()" style="font-size:11px;flex:none;padding:7px 10px">${catIcons[c]} ${c.charAt(0).toUpperCase()+c.slice(1)}</button>`).join("")}</div></div>
+    ${s.cat==="temp"?`
+      <div><div class="lbl">CONVERT FROM</div>${segs("conv.from",["F","C","K"],s.from,true)}</div>
+      ${ni("cv-val","VALUE",s.val,"","")}
+      ${btn("CONVERT","S.conv.val=gv('cv-val');R()")}
+    `:s.cat==="wire"?`
+      <div><div class="lbl">AWG SIZE</div>${segs("conv.from",Object.keys(WIRE_CMIL),s.from,true)}</div>
+    `:cat?`
+      <div class="row">
+        <div><div class="lbl">FROM</div>${segs("conv.from",cat.units,s.from,true)}</div>
+      </div>
+      ${ni("cv-val","VALUE",s.val,"","")}
+      ${btn("CONVERT","S.conv.val=gv('cv-val');R()")}
+    `:""}
+    ${result}
+    <div style="font-size:11px;color:#444;background:#0d0d0f;border-radius:8px;padding:10px;line-height:1.9">
+      <strong style="color:#555">Quick Reference:</strong><br>
+      1 HP = 746 W | 1 kW = 1000 W<br>
+      1 ft = 12 in = 30.48 cm<br>
+      1 circular mil = area of 1 mil diameter circle<br>
+      °C = (°F − 32) × 5/9
+    </div>
+  `)
+}
+
+/* ── Transformer ── */
+function rXfmr(){
+  const s=S.xfmr;
+  const detail=s.sel!=null?XFMRS[s.sel]:null;
+  return card(`${cl("Transformer Wiring Diagrams")}
+    <div class="xfmr-grid">
+      ${XFMRS.map((x,i)=>`<button class="xfmr-card${s.sel===i?" on":""}" onclick="S.xfmr.sel=S.xfmr.sel===${i}?null:${i};R()">
+        <div style="font-size:13px;font-weight:700;color:${s.sel===i?"#fbbf24":"white"};margin-bottom:3px">${x.t}</div>
+        <div style="font-size:11px;color:#555">${x.v}</div>
+      </button>`).join("")}
+    </div>
+    ${detail?`<div style="background:#0d0d0f;border:1px solid #fbbf2433;border-radius:10px;padding:15px;margin-top:8px;display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div class="lbl" style="margin-bottom:4px">Typical Use</div>
+        <div style="font-size:13px;color:#aaa;line-height:1.6">${detail.use}</div>
+      </div>
+      <div>
+        <div class="lbl" style="margin-bottom:4px">Wiring Method</div>
+        <div style="font-size:13px;color:#aaa;line-height:1.6">${detail.wire}</div>
+      </div>
+      <div style="background:#16161a;border-radius:8px;padding:12px">
+        <div class="lbl" style="margin-bottom:6px">Connection Diagram</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;color:#fbbf24;white-space:pre-line;line-height:1.8">${detail.img}</div>
+      </div>
+      <div style="font-size:11px;color:#444;line-height:1.7">
+        ⚡ Always verify transformer nameplate before connecting.<br>
+        ⚡ Transformers must be protected per NEC 450.3.<br>
+        ⚡ Ground the secondary per NEC 250.
+      </div>
+    </div>`:"<div style='font-size:13px;color:#444;text-align:center;padding:16px'>Tap a transformer type to see wiring details</div>"}
+  `)
+}
+
+/* ── Wire ── */
+function rWire(){
+  const s=S.wire;
+  let h=card(`${cl("Circuit Parameters")}
+    <div class="row">${ni("w-a","CURRENT",s.amps,"A")}${ni("w-d","ONE-WAY RUN",s.dist,"ft")}</div>
+    <div><div class="lbl">VOLTAGE</div>${segs("wire.vol",[120,208,240,277,480],s.vol)}</div>
+    <div class="row">
+      <div><div class="lbl">MATERIAL</div>${segs("wire.mat",["Copper","Aluminum"],s.mat)}</div>
+      <div><div class="lbl">PHASE</div>${segs("wire.phase",["Single Phase","3-Phase"],s.phase,true)}</div>
+    </div>
+    ${btn("CALCULATE WIRE GAUGE","calcWire()")}
+  `);
+  if(s.res&&!s.res.err){
+    const{mn,rec,all}=s.res;
+    h+=`<div class="tc-row">
+      <div class="tc" style="border-top:3px solid #60a5fa">${cl("Min. Ampacity")}<div class="bnum">${mn.g} AWG</div><div class="sub">${mn.amp}A rated</div><span class="dbadge" style="background:${dc(mn.pct)}22;color:${dc(mn.pct)}">${mn.pct.toFixed(2)}% — ${dl(mn.pct)}</span></div>
+      <div class="tc" style="border-top:3px solid #fbbf24;background:rgba(251,191,36,.05)">${cl("✓ Recommended","#fbbf24")}<div class="bnum" style="color:#fbbf24">${rec.g} AWG</div><div class="sub">${rec.amp}A rated</div><span class="dbadge" style="background:${dc(rec.pct)}22;color:${dc(rec.pct)}">${rec.pct.toFixed(2)}% — ${dl(rec.pct)}</span></div>
+    </div>`;
+    h+=card(`${cl("Gauge Comparison")}
+      <div class="thead"><span style="flex:1">GAUGE</span><span style="flex:1;text-align:center">AMPS</span><span style="flex:1.5;text-align:center">V-DROP</span><span style="flex:1.2;text-align:right">STATUS</span></div>
+      ${all.map(r=>`<div class="trow${r.g===rec.g?" hl":""}">
+        <span style="flex:1;font-weight:700;font-size:14px;font-family:'Barlow Condensed',sans-serif;color:${r.g===rec.g?"#fbbf24":"white"}">${r.g} AWG</span>
+        <span style="flex:1;text-align:center;color:#555;font-size:12px">${r.amp}A</span>
+        <span style="flex:1.5;text-align:center"><span style="color:${dc(r.pct)};font-weight:600;font-size:12px">${r.pct.toFixed(2)}%</span> <span style="color:#333;font-size:11px">(${r.vd.toFixed(2)}V)</span></span>
+        <span style="flex:1.2;text-align:right"><span style="font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;background:${dc(r.pct)}22;color:${dc(r.pct)}">${dl(r.pct)}</span></span>
+      </div>`).join("")}
+    `);
+    h+=card(`${cl("Shop & Find Stores")}
+      <div class="segs">${["nearby","amazon"].map(t=>`<button class="seg${s.stab===t?" on":""}" onclick="ss('wire.stab','${t}')">${t==="nearby"?"📍 Nearby Stores":"📦 Amazon"}</button>`).join("")}</div>
+      ${s.stab==="nearby"?rNearby():rAmz(rec.g,s.mat)}
+    `);
+  }
+  if(s.res?.err)h+=card(`<div style="color:#ef4444;font-weight:700;text-align:center">⚠️ Exceeds 4/0 AWG — consult a licensed engineer.</div>`);
+  return h;
+}
+
+function rNearby(){
+  const s=S.wire;
+  if(s.sst==="idle")return`<button class="find-btn" onclick="findStores()">📍 Find Electrical Supply Stores Near Me</button>`;
+  if(s.sst==="no_key")return`<div class="api-box"><div style="color:#fbbf24;font-weight:700;margin-bottom:5px">🔑 Add Google API Key</div><div style="color:#555;font-size:12px;line-height:1.7">Replace <code style="color:#fbbf24">YOUR_API_KEY_HERE</code> in the script.<br>Get free key at <strong style="color:#aaa">console.cloud.google.com</strong><br>Enable Places API — $200 free/month.</div></div>`;
+  if(s.sst==="locating"||s.sst==="loading")return`<div class="sbox"><span class="spin">${s.sst==="locating"?"📍":"⚡"}</span>${s.sst==="locating"?"Getting location...":"Finding stores..."}</div>`;
+  if(s.sst==="error")return`<div style="text-align:center"><div style="color:#ef4444;margin-bottom:7px;font-size:13px">Could not find stores.</div><button class="find-btn" onclick="findStores()">Try Again</button></div>`;
+  if(s.sst==="done"){
+    let o=`<div style="font-size:11px;color:#444;margin-bottom:5px">${s.stores.length} stores found near you</div>`;
+    s.stores.forEach(st=>{
+      o+=`<a href="https://www.google.com/maps/dir/?api=1&destination=${enc(st.address)}" target="_blank" class="store-a">
+        <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:white;margin-bottom:2px">${st.name}</div>
+        <div style="font-size:11px;color:#555;margin-bottom:3px">${st.address}</div>
+        <div style="display:flex;gap:7px">
+          ${st.distMi!=null?`<span style="font-size:11px;color:#fbbf24;font-weight:600">📍 ${st.distMi.toFixed(1)} mi</span>`:""}
+          ${st.open===true?`<span style="font-size:11px;color:#22c55e;font-weight:600">● Open</span>`:""}
+          ${st.open===false?`<span style="font-size:11px;color:#ef4444;font-weight:600">● Closed</span>`:""}
+          ${st.rating?`<span style="font-size:11px;color:#aaa">★ ${st.rating}</span>`:""}
+        </div></div><span style="color:#fbbf24;font-size:17px">→</span>
+      </a>`;
+    });
+    return o+`<button class="find-btn" style="background:transparent;font-size:12px;margin-top:3px" onclick="findStores()">🔄 Refresh</button>`;
+  }
+  return "";
+}
+
+function rAmz(g,mat){
+  const m=mat.toLowerCase(),ir=[14,12,10].includes(parseInt(g))&&m==="copper";
+  const pw=ir?`NM-B ${g}/2 Romex wire`:`THHN ${g} AWG ${m} wire`;
+  return[{l:pw,s:"Primary wire"},{l:`${BR[g]||60}A circuit breaker`,s:"Breaker"},{l:(WT[g]?.c||"1/2 EMT").replace(/"/g,"in")+" conduit",s:"Conduit"}]
+    .map(lk=>`<a href="https://www.amazon.com/s?k=${enc(lk.l)}" target="_blank" class="amz-a"><span style="font-size:17px">🔶</span><div style="flex:1"><div style="font-size:13px;font-weight:700;color:white">${lk.l}</div><div style="font-size:11px;color:#555">${lk.s}</div></div><span style="color:#f90">→</span></a>`).join("");
+}
+
+/* ── Conduit Fill ── */
+function rConduit(){
+  const s=S.conduit;
+  const area=CA[s.cond]||0;
+  const used=s.wires.reduce((sum,w)=>sum+(WA[w.g]||0)*(parseInt(w.q)||0),0);
+  const pct=area>0?(used/area)*100:0;
+  const max=s.wires.length===1?53:s.wires.length===2?31:40;
+  const ok=pct<=max;
+  return card(`${cl("Conduit Type")}<select class="sel" onchange="S.conduit.cond=this.value;R()">${Object.keys(CA).map(c=>`<option${c===s.cond?" selected":""}>${c}</option>`).join("")}</select>`)
+    +card(`${cl("Conductors")}
+      ${s.wires.map((w,i)=>`<div style="display:flex;gap:7px;align-items:center;margin-bottom:7px">
+        <select class="sel" style="flex:2" onchange="S.conduit.wires[${i}].g=this.value;R()">${Object.keys(WA).map(g=>`<option${g===w.g?" selected":""}>${g}</option>`).join("")}</select>
+        <input type="number" class="inp" style="flex:1;padding:9px 7px;font-size:15px" value="${w.q}" min="1" onchange="S.conduit.wires[${i}].q=parseInt(this.value)||1;R()"/>
+        ${s.wires.length>1?`<button class="rm-btn" onclick="S.conduit.wires.splice(${i},1);R()">✕</button>`:""}
+      </div>`).join("")}
+      <button class="add-btn" onclick="S.conduit.wires.push({g:'12 THHN',q:1});R()">+ Add Wire</button>
+    `)
+    +card(`${cl("Fill Result")}
+      <div class="irow">${ib(pct.toFixed(1)+"%","Fill %",ok?"#22c55e":"#ef4444")}${ib(max+"%","Max Allowed")}${ib(used.toFixed(4)+'in²',"Wire Area")}</div>
+      <div class="${ok?"pass":"fail"}">${ok?`✓ PASS — ${(area-used).toFixed(4)}" remaining`:`✗ FAIL — Use larger conduit`}</div>
+      <div style="font-size:11px;color:#444">NEC: 1 wire=53%, 2 wires=31%, 3+ wires=40%</div>
+    `,"border-top:3px solid "+(ok?"#22c55e":"#ef4444"));
+}
+
+/* ── Ohm's Law ── */
+function rOhms(){
+  const s=S.ohms;
+  return card(`${cl("Find")}${segs("ohms.mode",["V","I","R","P"],s.mode)}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${s.mode!=="V"?ni("o-v","VOLTAGE",s.v,"V"):""}${s.mode!=="I"?ni("o-i","CURRENT",s.i,"A"):""}
+      ${s.mode!=="R"?ni("o-r","RESISTANCE",s.r,"Ω"):""}${s.mode!=="P"?ni("o-p","POWER",s.p,"W"):""}
+    </div>${btn("CALCULATE","calcOhms()")}
+  `)+(s.v||s.i||s.r||s.p?card(`${cl("Results")}<div class="irow">
+    ${s.v?ib(parseFloat(s.v).toFixed(3)+"V","Voltage"):""}${s.i?ib(parseFloat(s.i).toFixed(3)+"A","Current"):""}
+    ${s.r?ib(parseFloat(s.r).toFixed(3)+"Ω","Resistance"):""}${s.p?ib(parseFloat(s.p).toFixed(3)+"W","Power"):""}
+  </div><div style="background:#0d0d0f;border-radius:8px;padding:10px;font-size:11px;color:#555;line-height:1.9">V=I×R | I=V/R | R=V/I | P=V×I | P=I²×R</div>`):"");
+}
+
+/* ── Load Calc ── */
+function rLoad(){
+  const s=S.load;
+  const tot=s.loads.reduce((sum,l)=>sum+(parseFloat(l.a)||0)*(l.cont?1.25:1),0);
+  const kw=tot*(s.vol/1000)*(s.phase==="3-Phase"?Math.sqrt(3):1);
+  const rec=GO.find(g=>(CAMP[g]||0)>=tot);
+  return card(`${cl("System")}<div class="row">
+    <div><div class="lbl">VOLTAGE</div>${segs("load.vol",[120,208,240,277,480],s.vol)}</div>
+    <div><div class="lbl">PHASE</div>${segs("load.phase",["Single Phase","3-Phase"],s.phase,true)}</div>
+  </div>`)
+  +card(`${cl("Loads")}
+    ${s.loads.map((l,i)=>`<div style="background:#0d0d0f;border-radius:8px;padding:10px;margin-bottom:7px">
+      <div style="display:flex;gap:7px;margin-bottom:7px">
+        <input class="inp" style="flex:2;font-size:13px;padding:8px 10px" placeholder="Load name" value="${l.n||""}" oninput="S.load.loads[${i}].n=this.value"/>
+        <div style="position:relative;flex:1"><input type="number" class="inp" style="font-size:13px;padding:8px 30px 8px 10px;width:100%" placeholder="A" value="${l.a||""}" oninput="S.load.loads[${i}].a=this.value"/><span class="inp-u" style="font-size:11px">A</span></div>
+        ${s.loads.length>1?`<button class="rm-btn" onclick="S.load.loads.splice(${i},1);R()">✕</button>`:""}
+      </div>
+      <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+        <input type="checkbox" ${l.cont?"checked":""} style="accent-color:#fbbf24;width:15px;height:15px" onchange="S.load.loads[${i}].cont=this.checked;R()"/>
+        <span style="font-size:12px;color:#666">Continuous load (×1.25 NEC)</span>
+      </label>
+    </div>`).join("")}
+    <button class="add-btn" onclick="S.load.loads.push({n:'',a:'',cont:false});R()">+ Add Load</button>
+  `)
+  +card(`${cl("Total Load")}<div class="irow">${ib(tot.toFixed(1)+"A","Total Amps")}${ib(kw.toFixed(2)+" kW","Power")}${ib(rec?(rec+" AWG"):"4/0+","Min Wire")}</div>
+    ${rec?`<div style="font-size:13px;color:#aaa">Recommended breaker: <strong style="color:white">${BR[rec]}A</strong></div>`:""}
+  `,"border-top:3px solid #fbbf24");
+}
+
+/* ── Box Fill ── */
+function rBox(){
+  const s=S.box;
+  const fv=BFV[s.gauge]||2.0,bv=BOXES.find(b=>b.n===s.box)?.v||10.5;
+  const tot=(parseInt(s.cond)||0)*fv+(parseInt(s.dev)||0)*2*fv+(s.clamp?fv:0)+((parseInt(s.gnd)||0)>0?fv:0);
+  const ok=tot<=bv;
+  return card(`${cl("Box and Wire Size")}
+    <div class="lbl">BOX TYPE</div>
+    <select class="sel" onchange="S.box.box=this.value;R()">${BOXES.map(b=>`<option${b.n===s.box?" selected":""}>${b.n} — ${b.v} in³</option>`).join("")}</select>
+    <div class="lbl">WIRE GAUGE</div>${segs("box.gauge",["14 AWG","12 AWG","10 AWG","8 AWG"],s.gauge,true)}
+  `)
+  +card(`${cl("Contents")}<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    ${ni("bx-c","CONDUCTORS",s.cond)}${ni("bx-d","DEVICES",s.dev)}${ni("bx-g","GROUNDS",s.gnd)}
+  </div>
+    <label style="display:flex;align-items:center;gap:7px;cursor:pointer">
+      <input type="checkbox" ${s.clamp?"checked":""} style="accent-color:#fbbf24;width:15px;height:15px" onchange="S.box.clamp=this.checked;R()"/>
+      <span style="font-size:12px;color:#666">Internal cable clamps</span>
+    </label>${btn("CALCULATE BOX FILL","calcBox()")}
+  `)
+  +card(`<div class="irow">${ib(tot.toFixed(1)+" in³","Used",ok?"#22c55e":"#ef4444")}${ib(bv+" in³","Box Volume")}${ib(((tot/bv)*100).toFixed(0)+"%","Fill %",ok?"#22c55e":"#ef4444")}</div>
+    <div class="${ok?"pass":"fail"}">${ok?`✓ PASS — ${(bv-tot).toFixed(1)} in³ remaining`:`✗ FAIL — Use a larger box`}</div>
+    <div style="font-size:11px;color:#444">NEC 314.16: Device=2, clamps=1 (total)</div>
+  `,"border-top:3px solid "+(ok?"#22c55e":"#ef4444"));
+}
+
+/* ── Motor FLA ── */
+function rMotor(){
+  const s=S.motor,t=s.phase==="3-Phase"?M3:M1,fla=t[s.hp];
+  const mw=fla?GO.find(g=>(CAMP[g]||0)>=fla*1.25):null;
+  return card(`${cl("Motor Parameters")}
+    <div class="lbl">PHASE</div>${segs("motor.phase",["Single Phase","3-Phase"],s.phase)}
+    <div class="lbl">VOLTAGE</div>${segs("motor.vol",s.phase==="3-Phase"?[208,230,460,575]:[115,230],s.vol)}
+    <div class="lbl">HORSEPOWER</div>
+    <div class="segs" style="flex-wrap:wrap">${Object.keys(t).map(h=>`<button class="seg${s.hp==h?" on":""}" style="min-width:46px;font-size:12px" onclick="S.motor.hp='${h}';R()">${h} HP</button>`).join("")}</div>
+  `)+(fla?card(`<div class="irow">${ib(fla+"A","FLA")}${ib((fla*1.25).toFixed(1)+"A","125% FLA")}${ib((mw||"4/0+")+" AWG","Min Wire")}${ib(Math.ceil(fla*2.5)+"A","Max Breaker")}</div>
+    <div style="font-size:11px;color:#444;line-height:1.8">• Conductor: 125% FLA (NEC 430.22)<br>• Breaker: 250% FLA (NEC 430.52)</div>
+  `,"border-top:3px solid #fbbf24"):"");
+}
+
+/* ── 3-Phase ── */
+function rTp(){
+  const s=S.tp;
+  return card(`${cl("3-Phase Power Calculator")}
+    <div class="lbl">FIND</div>${segs("tp.mode",["find-amps","find-kva"],s.mode)}
+    <div class="lbl">LINE VOLTAGE</div>${segs("tp.vol",[208,240,480,600],s.vol)}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${s.mode==="find-amps"?ni("tp-kva","kVA",s.kva,"kVA")+ni("tp-kw","kW (opt)",s.kw,"kW"):ni("tp-a","CURRENT",s.amps,"A")}
+      ${ni("tp-pf","POWER FACTOR",s.pf,"","0.85")}
+    </div>${btn("CALCULATE","calcTp()")}
+  `)+(s.amps||s.kva||s.kw?card(`<div class="irow">
+    ${s.amps?ib(s.amps+"A","Current"):""}${s.kva?ib(s.kva+" kVA","Apparent Power"):""}${s.kw?ib(s.kw+" kW","Real Power"):""}
+  </div>`):"");
+}
+
+/* ── Job Cost ── */
+function rJc(){
+  const s=S.jc;
+  const lc=s.items.filter(i=>i.cat==="labor").reduce((t,i)=>t+(parseFloat(i.q)||0)*(parseFloat(i.p)||0),0);
+  const mc=s.items.filter(i=>i.cat==="material").reduce((t,i)=>t+(parseFloat(i.q)||0)*(parseFloat(i.p)||0),0);
+  const sub=lc+mc,oh=sub*(parseFloat(s.oh)||0)/100,pr=(sub+oh)*(parseFloat(s.pr)||0)/100,tot=sub+oh+pr;
+  const row=(item,i,cat)=>`<div style="display:flex;gap:6px;align-items:center;margin-bottom:7px">
+    <input class="inp" style="flex:2;font-size:12px;padding:8px 9px" placeholder="${cat==="labor"?"Task":"Material"}" value="${item.d||""}" oninput="S.jc.items[${i}].d=this.value"/>
+    <input type="number" class="inp" style="flex:0 0 50px;font-size:13px;padding:8px 5px;text-align:center" value="${item.q||""}" oninput="S.jc.items[${i}].q=this.value"/>
+    <div style="position:relative;flex:1"><input type="number" class="inp" style="font-size:13px;padding:8px 7px 8px 15px;width:100%" value="${item.p||""}" oninput="S.jc.items[${i}].p=this.value"/><span style="position:absolute;left:5px;top:50%;transform:translateY(-50%);color:#444;font-size:12px">$</span></div>
+    <span style="font-size:12px;font-weight:700;color:#fbbf24;min-width:50px;text-align:right">$${((parseFloat(item.q)||0)*(parseFloat(item.p)||0)).toFixed(2)}</span>
+    ${s.items.length>1?`<button class="rm-btn" onclick="S.jc.items.splice(${i},1);R()">✕</button>`:""}
+  </div>`;
+  return card(`${cl("Job Info")}${ti("jc-cl","CLIENT / JOB NAME",s.cl,"e.g. Smith Residence")}`)
+    +card(`<div style="display:flex;justify-content:space-between;align-items:center">${cl("Labor")}<button class="mini-btn" onclick="S.jc.items.push({d:'',q:'',u:'hrs',p:'',cat:'labor'});R()">+ Add</button></div>${s.items.map((item,i)=>item.cat!=="labor"?"":row(item,i,"labor")).join("")}`)
+    +card(`<div style="display:flex;justify-content:space-between;align-items:center">${cl("Materials")}<button class="mini-btn" onclick="S.jc.items.push({d:'',q:'',u:'each',p:'',cat:'material'});R()">+ Add</button></div>${s.items.map((item,i)=>item.cat!=="material"?"":row(item,i,"material")).join("")}`)
+    +card(`${cl("Overhead and Profit")}<div class="row">${ni("jc-oh","OVERHEAD %",s.oh,"%")}${ni("jc-pr","PROFIT MARGIN %",s.pr,"%")}</div>${btn("UPDATE","calcJc()")}`)
+    +card(`${cl("Job Total","#22c55e")}<div class="irow">${ib("$"+lc.toFixed(2),"Labor","#60a5fa")}${ib("$"+mc.toFixed(2),"Materials","#f59e0b")}${ib("$"+oh.toFixed(2),"Overhead")}${ib("$"+pr.toFixed(2),"Profit","#a78bfa")}</div>
+      <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:15px;color:#aaa;font-weight:600">TOTAL BID</span>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:#22c55e">$${tot.toFixed(2)}</span>
+      </div>`,"border-top:3px solid #22c55e");
+}
+
+/* ── Material Est ── */
+function rMat(){
+  const s=S.mat;
+  const tot=s.items.reduce((sum,item)=>sum+(parseFloat(item.q)||0)*(MP[item.m]||0),0);
+  return card(`${cl("Materials List")}<div style="font-size:12px;color:#555;margin-bottom:3px">Average prices — verify with supplier</div>
+    ${s.items.map((item,i)=>`<div style="display:flex;gap:7px;align-items:center;margin-bottom:7px">
+      <select class="sel" style="flex:3;font-size:11px" onchange="S.mat.items[${i}].m=this.value;R()">${Object.keys(MP).map(m=>`<option${m===item.m?" selected":""}>${m}</option>`).join("")}</select>
+      <input type="number" class="inp" style="flex:0 0 65px;font-size:14px;padding:8px 7px;text-align:center" value="${item.q||""}" placeholder="Qty" oninput="S.mat.items[${i}].q=this.value;R()"/>
+      <span style="font-size:12px;font-weight:700;color:#fbbf24;min-width:58px;text-align:right">$${((parseFloat(item.q)||0)*(MP[item.m]||0)).toFixed(2)}</span>
+      ${s.items.length>1?`<button class="rm-btn" onclick="S.mat.items.splice(${i},1);R()">✕</button>`:""}
+    </div>`).join("")}
+    <button class="add-btn" onclick="S.mat.items.push({m:Object.keys(MP)[0],q:''});R()">+ Add Material</button>
+  `)
+  +card(`${cl("Estimate")}<div class="irow">${ib("$"+tot.toFixed(2),"Materials Cost")}${ib("$"+(tot*1.15).toFixed(2),"+15% Markup")}${ib("$"+(tot*1.25).toFixed(2),"+25% Markup")}</div>
+    <div style="font-size:11px;color:#444">Average prices. Always get real quotes for large jobs.</div>
+  `,"border-top:3px solid #fbbf24");
+}
+
+/* ── NEC Ref ── */
+function rNec(){
+  const s=S.nec;
+  const fil=NECS.map((a,idx)=>({...a,idx})).filter(a=>!s.s||a.a.includes(s.s)||a.t.toLowerCase().includes(s.s.toLowerCase())||a.s.toLowerCase().includes(s.s.toLowerCase()));
+  return card(`${cl("NEC 2023 Quick Reference")}
+    <input class="inp" style="font-size:13px;padding:9px 12px" placeholder="Search articles, topics, keywords..." value="${s.s||""}" oninput="S.nec.s=this.value;R()"/>
+    <div style="font-size:11px;color:#444">${fil.length} articles</div>
+  `)+fil.map(a=>`<div class="nec-item${s.open===a.idx?" on":""}" onclick="toggleNEC(${a.idx})">
+    <div style="display:flex;align-items:center;gap:9px">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:17px;color:#fbbf24;min-width:44px">§${a.a}</span>
+      <span style="font-size:13px;font-weight:600;color:white;flex:1">${a.t}</span>
+      <span style="color:#444;font-size:14px;flex-shrink:0">${s.open===a.idx?"▲":"▼"}</span>
+    </div>
+    ${s.open===a.idx?`<div style="font-size:13px;color:#aaa;line-height:1.8;border-top:1px solid #2a2a30;padding-top:9px;margin-top:9px;white-space:pre-line">${a.s}</div>`:""}
+  </div>`).join("");
+}
+function toggleNEC(i){S.nec.open=S.nec.open===i?null:i;R()}
+
+/* ── Exam ── */
+function rExam(){
+  const s=S.exam;
+  if(s.done&&s.sc.t===EQ.length){
+    const pct=((s.sc.c/EQ.length)*100).toFixed(0);
+    return card(`<div style="text-align:center;padding:20px">
+      <div style="font-size:38px;margin-bottom:10px">🎓</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:800;color:#fbbf24;margin-bottom:7px">${s.sc.c}/${EQ.length}</div>
+      <div style="font-size:15px;color:#aaa;margin-bottom:3px">${pct}% Score</div>
+      <div style="font-size:13px;color:#555;margin-bottom:18px">${s.sc.c>=16?"✅ Excellent! Ready for the exam.":s.sc.c>=12?"📚 Good — review missed topics.":"⚠ Keep studying the NEC articles."}</div>
+      ${btn("Try Again","restartExam()")}
+    </div>`);
+  }
+  const q=EQ[s.i];const ans=s.sel!==null;const cor=s.sel===q.a;
+  return card(`
+    <div style="display:flex;justify-content:space-between;align-items:center">${cl("Electrician Exam Prep")}<div style="font-size:12px;color:#555">Q${s.i+1}/${EQ.length}</div></div>
+    <div style="background:#0d0d0f;border-radius:7px;overflow:hidden"><div style="height:3px;background:#fbbf24;width:${(s.i/EQ.length)*100}%;transition:width .3s"></div></div>
+    <div style="font-size:14px;font-weight:600;color:white;line-height:1.5;padding:2px 0">${q.q}</div>
+    ${q.o.map((opt,i)=>{
+      let c="opt";
+      if(ans){if(i===q.a)c+=" correct";else if(i===s.sel&&s.sel!==q.a)c+=" wrong";}
+      else if(s.sel===i)c+=" picked";
+      return`<button class="${c}" onclick="${ans?"":"selectA("+i+")"}" style="${ans?"cursor:default":""}"><strong>${String.fromCharCode(65+i)}.</strong> ${opt}</button>`;
+    }).join("")}
+    ${ans?`<div style="background:${cor?"rgba(34,197,94,.1)":"rgba(239,68,68,.1)"};border:1px solid ${cor?"rgba(34,197,94,.3)":"rgba(239,68,68,.3)"};border-radius:8px;padding:9px 13px">
+      <div style="color:${cor?"#22c55e":"#ef4444"};font-weight:700;margin-bottom:2px">${cor?"✓ Correct!":"✗ Incorrect"}</div>
+      <div style="font-size:12px;color:#666">Reference: ${q.r}</div>
+    </div>`:""}
+    ${btn(ans?s.i===EQ.length-1?"See Results →":"Next Question →":"Skip","nextQ()",ans?"#fbbf24":"#2a2a30",ans?"#0d0d0f":"#555")}
+    <div style="font-size:11px;color:#444;text-align:center">Score: ${s.sc.c}/${s.sc.t} correct</div>
+  `);
+}
+function selectA(i){if(S.exam.sel!==null)return;S.exam.sel=i;R()}
+function nextQ(){const s=S.exam;if(s.sel!==null)s.sc={c:s.sc.c+(s.sel===EQ[s.i].a?1:0),t:s.sc.t+1};if(s.i===EQ.length-1){s.done=true;R();return;}s.i++;s.sel=null;R()}
+function restartExam(){S.exam={i:0,sel:null,sc:{c:0,t:0},done:false};R()}
+
+/* ── Quote ── */
+function rQuote(){
+  const s=S.quote;
+  if(s.prev){
+    const sub=s.items.reduce((t,i)=>t+(parseFloat(i.p)||0)*(parseInt(i.q)||1),0);
+    const tax=sub*.08,tot=sub+tax;
+    const qn="Q-"+Date.now().toString().slice(-6);
+    const dt=new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
+    return`<div class="no-print" style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn" style="background:#2a2a30;color:#aaa;flex:1" onclick="S.quote.prev=false;R()">← Edit</button>
+      <button class="btn" style="flex:2" onclick="window.print()">🖨 Print / Save PDF</button>
+    </div>
+    <div style="background:white;border-radius:12px;overflow:hidden;color:#333">
+      <div style="background:#1a1a2e;padding:22px 26px;display:flex;justify-content:space-between">
+        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:white">${s.biz||"Your Business"}</div><div style="color:rgba(255,255,255,.4);font-size:12px">⚡ Licensed Electrician</div></div>
+        <div style="text-align:right"><div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:#fbbf24">Quote #${qn}</div><div style="color:rgba(255,255,255,.5);font-size:12px">${dt}</div></div>
+      </div>
+      <div style="padding:14px 26px;background:#f9f9f9">
+        <div style="font-size:10px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:3px">BILL TO</div>
+        <div style="font-size:14px;font-weight:700;color:#1a1a2e">${s.cl||"Client"}</div>
+        <div style="font-size:12px;color:#666">${s.addr||""}</div>
+        <div style="font-size:12px;color:#666">${s.email||""} ${s.ph||""}</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:#1a1a2e">${["DESCRIPTION","UNIT","QTY","PRICE","AMOUNT"].map((h,i)=>`<th style="padding:8px ${i===0||i===4?14:7}px;font-size:10px;color:white;text-align:${i===0?"left":i===4?"right":"center"}">${h}</th>`).join("")}</tr></thead>
+        <tbody>${s.items.map((it,i)=>`<tr style="background:${i%2===0?"#f9f9f9":"white"};border-bottom:1px solid #eee">
+          <td style="padding:9px 14px;font-size:12px;color:#333;font-weight:500">${it.d||"Item"}</td>
+          <td style="padding:9px 7px;font-size:12px;color:#666;text-align:center">${it.u}</td>
+          <td style="padding:9px 7px;font-size:12px;text-align:center">${it.q}</td>
+          <td style="padding:9px 7px;font-size:12px;text-align:center">$${parseFloat(it.p||0).toFixed(2)}</td>
+          <td style="padding:9px 14px;font-size:12px;font-weight:700;color:#1a1a2e;text-align:right">$${((parseFloat(it.p)||0)*(parseInt(it.q)||1)).toFixed(2)}</td>
+        </tr>`).join("")}</tbody>
+      </table>
+      <div style="padding:14px 26px;display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+        <div style="display:flex;gap:28px;font-size:12px;color:#555"><span>Subtotal</span><span>$${sub.toFixed(2)}</span></div>
+        <div style="display:flex;gap:28px;font-size:12px;color:#555"><span>Tax (8%)</span><span>$${tax.toFixed(2)}</span></div>
+        <div style="display:flex;gap:28px;font-size:17px;font-weight:800;color:#1a1a2e;border-top:2px solid #1a1a2e;padding-top:6px;margin-top:3px"><span>TOTAL</span><span>$${tot.toFixed(2)}</span></div>
+      </div>
+      ${s.notes?`<div style="padding:0 26px 18px"><div style="font-size:10px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:4px">NOTES</div><div style="font-size:12px;color:#555">${s.notes}</div></div>`:""}
+      <div style="background:#1a1a2e;padding:11px 26px;display:flex;justify-content:space-between"><span style="color:white;font-size:12px;font-weight:600">Thank you for your business!</span><span style="color:rgba(255,255,255,.3);font-size:10px">ElectriTools</span></div>
+    </div>`;
+  }
+  return card(`${cl("Business Info")}${ti("q-biz","BUSINESS NAME",s.biz,"Your Electrical Co.")}`)
+    +card(`${cl("Client Info")}${ti("q-cl","CLIENT NAME",s.cl,"John Smith")}${ti("q-addr","JOB ADDRESS",s.addr,"123 Main St")}
+      <div class="row">${ti("q-em","EMAIL",s.email,"client@email.com")}${ti("q-ph","PHONE",s.ph,"(555) 000-0000")}</div>`)
+    +card(`<div style="display:flex;justify-content:space-between;align-items:center">${cl("Line Items")}<button class="mini-btn" onclick="S.quote.items.push({d:'',q:1,u:'each',p:''});R()">+ Add</button></div>
+      ${s.items.map((it,i)=>`<div style="background:#0d0d0f;border:1px solid #1e1e24;border-radius:8px;padding:9px;margin-bottom:7px;display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+        <input class="inp" style="flex:3;min-width:90px;font-size:12px;padding:8px 9px" placeholder="Description" value="${it.d||""}" oninput="S.quote.items[${i}].d=this.value"/>
+        <input type="number" class="inp" style="flex:0 0 45px;font-size:12px;padding:8px 5px;text-align:center" value="${it.q}" oninput="S.quote.items[${i}].q=this.value"/>
+        <select class="sel" style="flex:0 0 64px;font-size:11px;padding:8px 5px" onchange="S.quote.items[${i}].u=this.value">${["each","hrs","ft","sq ft","lot"].map(u=>`<option${u===it.u?" selected":""}>${u}</option>`).join("")}</select>
+        <div style="position:relative;flex:1;min-width:65px"><input type="number" class="inp" style="font-size:12px;padding:8px 7px 8px 14px;width:100%" placeholder="Price" value="${it.p||""}" oninput="S.quote.items[${i}].p=this.value"/><span style="position:absolute;left:5px;top:50%;transform:translateY(-50%);color:#444;font-size:11px">$</span></div>
+        <span style="font-size:12px;font-weight:700;color:#fbbf24;min-width:52px;text-align:right">$${((parseFloat(it.p)||0)*(parseInt(it.q)||1)).toFixed(2)}</span>
+        ${s.items.length>1?`<button class="rm-btn" onclick="S.quote.items.splice(${i},1);R()">✕</button>`:""}
+      </div>`).join("")}`)
+    +card(`${cl("Notes")}<textarea class="inp" placeholder="Payment due within 30 days..." oninput="S.quote.notes=this.value">${s.notes||""}</textarea>`)
+    +card(`<div class="irow">${ib("$"+(s.items.reduce((t,i)=>t+(parseFloat(i.p)||0)*(parseInt(i.q)||1),0)).toFixed(2),"Subtotal")}${ib("$"+(s.items.reduce((t,i)=>t+(parseFloat(i.p)||0)*(parseInt(i.q)||1),0)*.08).toFixed(2),"Tax 8%")}${ib("$"+(s.items.reduce((t,i)=>t+(parseFloat(i.p)||0)*(parseInt(i.q)||1),0)*1.08).toFixed(2),"Total","#22c55e")}</div>
+      ${btn("Preview and Print Quote","calcQuote()","#22c55e","white")}`,"border-top:3px solid #22c55e");
+}
+
+/* ── Pricing ── */
+function rPricing(){
+  const f={
+    free:["Wire gauge calculator","GPS store finder","Amazon product links","NEC warnings"],
+    pro:["Everything in Free","Conduit fill & box fill","Ohm's law & load calc","Motor FLA & 3-phase power","NEMA wiring configurations","Conduit bending calculator","Transformer wiring diagrams","Conversion tables","Job cost calculator","Material estimator","NEC article reference","Exam prep (20 questions)","Quote generator"],
+    teams:["Everything in Pro","3 team member accounts","Shared job notes","Priority support"],
+  };
+  return`<div style="text-align:center;margin-bottom:14px"><div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:white;margin-bottom:3px">Choose Your Plan</div><div style="font-size:13px;color:#555">Upgrade anytime. Cancel anytime.</div></div>`
+    +Object.entries(PLANS).map(([key,pl])=>`<div class="pcard" style="${key===plan?`border:2px solid ${pl.c};background:${pl.c}08`:""}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:${pl.c}">${pl.l}</div><div style="font-size:11px;color:#555">${key==="free"?"Free forever":key==="pro"?"Per user/month":"Per team/month"}</div></div>
+        <div style="text-align:right"><div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:white">$${pl.p}</div><div style="font-size:10px;color:#444">/month</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">${f[key].map(ft=>`<div style="display:flex;gap:7px;align-items:center"><span style="color:${pl.c};font-size:11px;flex-shrink:0">✓</span><span style="font-size:12px;color:${key==="free"?"#555":"#aaa"}">${ft}</span></div>`).join("")}</div>
+      ${key===plan?`<div style="text-align:center;font-size:13px;color:${pl.c};font-weight:700;padding:8px;background:${pl.c}11;border-radius:8px">✓ Current Plan</div>`
+        :`<button class="btn" style="background:${pl.c};color:${key==="pro"?"#0d0d0f":"white"}" onclick="selPlan('${key}')">${key==="free"?"Downgrade to Free":`Upgrade to ${pl.l} — $${pl.p}/mo`}</button>`}
+    </div>`).join("")
+    +`<div style="text-align:center;font-size:11px;color:#333;margin-top:7px">💳 Stripe payments coming soon</div>`;
+}
+
+/* ── Teams ── */
+function rTeams(){
+  if(!ok("teams"))return`<div style="text-align:center;padding:36px;display:flex;flex-direction:column;align-items:center;gap:9px">
+    <div style="font-size:36px">🔒</div><div style="font-size:17px;font-weight:700">Teams Feature</div>
+    <div style="color:#555;font-size:13px">Upgrade to Teams ($19/mo)</div>
+    <button class="btn" style="width:190px" onclick="go('pricing')">Upgrade →</button>
+  </div>`;
+  return card(`${cl("Team Members")}
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+      <div style="width:34px;height:34px;border-radius:50%;background:rgba(251,191,36,.1);border:2px solid rgba(251,191,36,.3);display:flex;align-items:center;justify-content:center;color:#fbbf24;font-weight:700">Y</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">You (Owner)</div><div style="font-size:11px;color:#555">you@company.com</div></div>
+      <span style="font-size:11px;color:#fbbf24;font-weight:700;padding:2px 7px;background:rgba(251,191,36,.1);border-radius:20px">Admin</span>
+    </div>
+    <button class="add-btn">+ Invite Team Member</button>
+  `)+card(`${cl("Shared Job Notes")}<textarea class="inp" style="height:90px" placeholder="Notes shared with your team..."></textarea>${btn("Save Notes","")}`);
+}
+
+/* ── Calculate functions ── */
+function calcWire(){
+  const s=S.wire;s.amps=parseFloat(gv("w-a"));s.dist=parseFloat(gv("w-d"));
+  if(!s.amps||!s.dist)return;
+  const r=wr(s.amps,s.dist,s.vol,s.mat.toLowerCase(),s.phase==="3-Phase"?"3ph":"single");
+  s.res=r.length===0?{err:true}:{mn:r[0],rec:r.find(g=>g.pct<=3)||r[r.length-1],all:r.slice(0,6)};
+  R();
+}
+function calcOhms(){
+  const s=S.ohms;s.v=gv("o-v");s.i=gv("o-i");s.r=gv("o-r");s.p=gv("o-p");
+  const v=parseFloat(s.v),i=parseFloat(s.i),r=parseFloat(s.r);
+  if(s.mode==="V"&&i&&r){s.v=(i*r).toFixed(4);s.p=(i*i*r).toFixed(4)}
+  if(s.mode==="I"&&v&&r){s.i=(v/r).toFixed(4);s.p=(v*v/r).toFixed(4)}
+  if(s.mode==="R"&&v&&i){s.r=(v/i).toFixed(4);s.p=(v*i).toFixed(4)}
+  if(s.mode==="P"&&v&&i){s.p=(v*i).toFixed(4)}
+  R();
+}
+function calcBox(){S.box.cond=gv("bx-c");S.box.dev=gv("bx-d");S.box.gnd=gv("bx-g");R()}
+function calcJc(){S.jc.cl=gv("jc-cl");S.jc.oh=gv("jc-oh");S.jc.pr=gv("jc-pr");R()}
+function calcTp(){
+  const s=S.tp;s.kva=gv("tp-kva");s.kw=gv("tp-kw");s.amps=gv("tp-a");s.pf=gv("tp-pf");
+  const v=parseFloat(s.vol),pf=parseFloat(s.pf)||1,s3=Math.sqrt(3);
+  if(s.mode==="find-amps"){const kv=parseFloat(s.kva)||(parseFloat(s.kw)/pf);if(kv){s.amps=((kv*1000)/(s3*v)).toFixed(2);s.kva=kv.toFixed(3);s.kw=(kv*pf).toFixed(3)}}
+  if(s.mode==="find-kva"){const a=parseFloat(s.amps);if(a){const kv=(a*s3*v)/1000;s.kva=kv.toFixed(3);s.kw=(kv*pf).toFixed(3)}}
+  R();
+}
+function calcQuote(){
+  const s=S.quote;s.biz=gv("q-biz");s.cl=gv("q-cl");s.addr=gv("q-addr");s.email=gv("q-em");s.ph=gv("q-ph");s.prev=true;R();
+}
+function selPlan(p){plan=p;updBadge();go("wire")}
+
+/* ── Store finder ── */
+async function findStores(){
+  const s=S.wire;
+  if(GKEY==="YOUR_API_KEY_HERE"){s.sst="no_key";R();return}
+  s.sst="locating";s.stores=[];R();
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    s.sst="loading";R();
+    try{
+      await new Promise((res,rej)=>{
+        if(window.google?.maps?.places){res();return}
+        const sc=document.createElement("script");
+        sc.src=`https://maps.googleapis.com/maps/api/js?key=${GKEY}&libraries=places`;
+        sc.onload=res;sc.onerror=rej;document.head.appendChild(sc);
+      });
+      const div=document.createElement("div");
+      const map=new google.maps.Map(div,{center:{lat:pos.coords.latitude,lng:pos.coords.longitude},zoom:13});
+      const svc=new google.maps.places.PlacesService(map);
+      const qs=["electrical supply store","Home Depot","Lowe's","Graybar Electric"];
+      const all=[];const seen=new Set();
+      await Promise.all(qs.map(q=>new Promise(r=>{
+        svc.textSearch({query:q,location:{lat:pos.coords.latitude,lng:pos.coords.longitude},radius:20000},(results,status)=>{
+          if(status===google.maps.places.PlacesServiceStatus.OK&&results){
+            results.slice(0,3).forEach(p=>{
+              if(!seen.has(p.place_id)){
+                seen.add(p.place_id);
+                const pl=p.geometry.location.lat(),pln=p.geometry.location.lng();
+                const R=3958.8,dL=(pl-pos.coords.latitude)*Math.PI/180,dl=(pln-pos.coords.longitude)*Math.PI/180;
+                const x=Math.sin(dL/2)**2+Math.cos(pos.coords.latitude*Math.PI/180)*Math.cos(pl*Math.PI/180)*Math.sin(dl/2)**2;
+                all.push({name:p.name,address:p.formatted_address||p.vicinity,rating:p.rating,open:p.opening_hours?.open_now,placeId:p.place_id,distMi:R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))});
+              }
+            });
+          }
+          r();
+        });
+      })));
+      s.stores=all.sort((a,b)=>a.distMi-b.distMi).slice(0,8);s.sst="done";
+    }catch{s.sst="error"}
+    R();
+  },()=>{S.wire.sst="error";R()},{timeout:10000});
+}
+
+/* ── Tool registry ── */
+const TOOLS={
+  wire:{fn:rWire,plan:"free"},conduit:{fn:rConduit,plan:"pro"},box:{fn:rBox,plan:"pro"},
+  ohms:{fn:rOhms,plan:"pro"},load:{fn:rLoad,plan:"pro"},motor:{fn:rMotor,plan:"pro"},
+  "3phase":{fn:rTp,plan:"pro"},nema:{fn:rNema,plan:"pro"},bend:{fn:rBend,plan:"pro"},
+  conv:{fn:rConv,plan:"pro"},xfmr:{fn:rXfmr,plan:"pro"},
+  jobcost:{fn:rJc,plan:"pro"},mat:{fn:rMat,plan:"pro"},
+  nec:{fn:rNec,plan:"pro"},exam:{fn:rExam,plan:"pro"},quote:{fn:rQuote,plan:"pro"},
+  pricing:{fn:rPricing,plan:"free"},teams:{fn:rTeams,plan:"teams"},
+};
+
+const ALL_TOOLS=[
+  {id:"wire",l:"Wire Gauge",ic:"⚡",pl:"free"},{id:"conduit",l:"Conduit Fill",ic:"🔵",pl:"pro"},
+  {id:"box",l:"Box Fill",ic:"📦",pl:"pro"},{id:"ohms",l:"Ohm's Law",ic:"🔄",pl:"pro"},
+  {id:"load",l:"Load Calc",ic:"📊",pl:"pro"},{id:"motor",l:"Motor FLA",ic:"⚙️",pl:"pro"},
+  {id:"3phase",l:"3-Phase Power",ic:"🔋",pl:"pro"},{id:"nema",l:"NEMA Configs",ic:"🔌",pl:"pro"},
+  {id:"bend",l:"Conduit Bending",ic:"↩️",pl:"pro"},{id:"conv",l:"Conversions",ic:"📏",pl:"pro"},
+  {id:"xfmr",l:"Transformer Wiring",ic:"🔁",pl:"pro"},{id:"jobcost",l:"Job Cost",ic:"💰",pl:"pro"},
+  {id:"mat",l:"Material Est.",ic:"🧱",pl:"pro"},{id:"nec",l:"NEC Reference",ic:"📋",pl:"pro"},
+  {id:"exam",l:"Exam Prep",ic:"🎓",pl:"pro"},{id:"quote",l:"Quote Generator",ic:"📄",pl:"pro"},
+  {id:"pricing",l:"Plans & Pricing",ic:"💳",pl:"free"},{id:"teams",l:"Teams",ic:"👥",pl:"teams"},
+];
+
+const MAIN_TABS=[
+  {id:"wire",tid:"t-wire"},{id:"conduit",tid:"t-calc"},
+  {id:"jobcost",tid:"t-job"},{id:"nec",tid:"t-learn"},
+];
+
+/* ── Nav ── */
+let drawerOpen=false;
+function toggleDrawer(){drawerOpen?closeDrawer():openDrawer()}
+function openDrawer(){
+  drawerOpen=true;
+  document.getElementById("drawer").classList.add("on");
+  document.getElementById("overlay").classList.add("on");
+  document.getElementById("drw-grid").innerHTML=ALL_TOOLS.map(t=>`
+    <button class="drw-item${tool===t.id?" on":""}" onclick="go('${t.id}');closeDrawer()">
+      <span class="drw-ic">${t.ic}</span><span>${t.l}</span>
+      ${!ok(t.pl)?`<span class="drw-lock">🔒</span>`:""}
+    </button>`).join("");
+}
+function closeDrawer(){
+  drawerOpen=false;
+  document.getElementById("drawer").classList.remove("on");
+  document.getElementById("overlay").classList.remove("on");
+}
+
+function go(id){tool=id;R();window.scrollTo(0,0)}
+
+function updNav(){
+  MAIN_TABS.forEach(t=>{
+    const el=document.getElementById(t.tid);
+    if(el)el.className="tab"+(t.id===tool?" on":"");
+  });
+  if(!MAIN_TABS.find(t=>t.id===tool)){
+    document.getElementById("t-more").className="tab on";
+  }
+}
+
+function updBadge(){
+  const pl=PLANS[plan];const b=document.getElementById("plan-btn");
+  if(!b)return;
+  b.style.background=pl.c+"15";b.style.borderColor=pl.c+"33";b.style.color=pl.c;
+  b.textContent=pl.l+(plan!=="teams"?" — Upgrade ↑":"");
+}
+
+/* ── Render ── */
+function R(){
+  updNav();updBadge();
+  const tc=document.getElementById("tc");if(!tc)return;
+  const t=TOOLS[tool];if(!t){tc.innerHTML="";return}
+  if(!ok(t.plan)){
+    const c=t.plan==="teams"?"#60a5fa":"#fbbf24";
+    tc.innerHTML=`<div class="lock-wrap">
+      <div style="filter:blur(3px);pointer-events:none;user-select:none;opacity:0.35">${t.fn()}</div>
+      <div class="lock-ov">
+        <div style="font-size:32px">🔒</div>
+        <div style="font-size:17px;font-weight:700">${t.plan==="teams"?"Teams Feature":"Pro Feature"}</div>
+        <div style="font-size:13px;color:#555;text-align:center;max-width:190px">Upgrade to ${t.plan==="teams"?"Teams ($19/mo)":"Pro ($9/mo)"}</div>
+        <button class="btn" style="width:170px;background:${c};color:${t.plan==="pro"?"#0d0d0f":"white"}" onclick="go('pricing')">Upgrade →</button>
+      </div></div>`;
+    return;
+  }
+  tc.innerHTML=`<div class="fade-up">${t.fn()}</div>`;
+}
+
+R();
+</script>
+</body>
+</html>
